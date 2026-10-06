@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ title|default:"Coming Soon" }} · HBC Job Majuu{% endblock %}
+{% block content %}
+<div class="card" style="text-align:center;padding:60px 24px;">
+    <h1 style="margin-bottom:10px;">{{ title|default:"Coming Soon" }}</h1>
+    <p>This section is under construction.</p>
+    <a href="{% url 'client:dashboard' %}" class="btn btn-primary" style="margin-top:12px;">
+        ← Back to Dashboard
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Visa Readiness · HBC Job Majuu{% endblock %}
+{% block content %}
+<div class="card" style="padding:28px;">
+    <h1 style="margin-top:0;">Visa Readiness</h1>
+    <p>Track the core documents, evidence, and eligibility checks required for your migration journey.</p>
+
+    <table
+        style="width:100%; border-collapse:collapse; margin-top:18px; background:#fff; border:1px solid #e5eaf0; border-radius:12px; overflow:hidden;">
+        <thead>
+            <tr style="background:#f8fafc;">
+                <th style="text-align:left; padding:12px 14px;">Checklist item</th>
+                <th style="text-align:left; padding:12px 14px;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item, status in checklist %}
+            <tr style="border-top:1px solid #eef2f7;">
+                <td style="padding:12px 14px;">{{ item }}</td>
+                <td style="padding:12px 14px;">{{ status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if applications %}
+    <div style="margin-top:30px;">
+        <h3 style="margin-bottom:12px;">Latest application readiness</h3>
+        <div style="display:grid; gap:12px;">
+            {% for app in applications %}
+            <div class="card"
+                style="padding:16px 18px; border:1px solid #e5eaf0; border-radius:12px; background:#fff; display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap;">
+                <div>
+                    <div style="font-weight:800; color:#172033;">{{ app.job.title }}</div>
+                    <div style="font-size:0.84rem; color:#64748b;">Document status: {{ app.get_document_status_display
+                        }} · Visa: {{ app.get_visa_readiness_display }}</div>
+                </div>
+                <a href="{% url 'client:application_detail' app.id %}" class="btn btn-secondary">Open record</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

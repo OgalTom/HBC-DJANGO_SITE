@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard · HBC Job Majuu{% endblock %}
+{% block content %}
+<div style="display:grid; gap:22px;">
+    <section class="card" style="padding:28px;">
+        <h1 style="margin-top:0;">Admin operations dashboard</h1>
+        <p>Revenue, candidate flow, and operational oversight across the platform.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:22px;">
+            <div class="card" style="padding:18px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;">
+                <span
+                    style="color:#64748b;font-size:.74rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;">Users</span>
+                <strong style="display:block;font-size:1.75rem;margin-top:8px;">{{ total_users }}</strong>
+            </div>
+            <div class="card" style="padding:18px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;">
+                <span
+                    style="color:#64748b;font-size:.74rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;">Jobs</span>
+                <strong style="display:block;font-size:1.75rem;margin-top:8px;">{{ total_jobs }}</strong>
+            </div>
+            <div class="card" style="padding:18px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;">
+                <span
+                    style="color:#64748b;font-size:.74rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;">Applications</span>
+                <strong style="display:block;font-size:1.75rem;margin-top:8px;">{{ total_applications }}</strong>
+            </div>
+            <div class="card" style="padding:18px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;">
+                <span
+                    style="color:#64748b;font-size:.74rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;">Pending
+                    review</span>
+                <strong style="display:block;font-size:1.75rem;margin-top:8px;">{{ pending_review }}</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="card" style="padding:24px;">
+        <div
+            style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px;">
+            <h2 style="margin:0;">Operations</h2>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a href="{% url 'client:admin_jobs' %}" class="btn btn-primary">Manage jobs</a>
+                <a href="{% url 'client:manage_access' %}" class="btn btn-secondary">Manage access</a>
+            </div>
+        </div>
+        <p>Public opportunities are visible to all users, while membership-only roles stay behind the paid access layer.
+        </p>
+    </section>
+
+    <section class="card" style="padding:24px;">
+        <h2 style="margin-top:0;">Recent applications</h2>
+        {% if recent_applications %}
+        <div style="display:grid; gap:12px;">
+            {% for app in recent_applications %}
+            <div class="card" style="padding:14px 16px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
+                <div style="display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+                    <div>
+                        <strong>{{ app.candidate.get_full_name|default:app.candidate.email }}</strong><br>
+                        <span style="color:#64748b; font-size:.86rem;">{{ app.job.title }}</span>
+                    </div>
+                    <div style="color:#475569; font-size:.86rem;">{{ app.get_ats_stage_display }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No applications recorded yet.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

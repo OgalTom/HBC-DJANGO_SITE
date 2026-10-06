@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Application record · HBC Job Majuu{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto;">
+    <div class="card" style="padding: 28px; margin-bottom: 24px;">
+        <div
+            style="display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 20px;">
+            <div>
+                <p
+                    style="text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.72rem; font-weight: 800; color: #7a8797; margin: 0 0 8px;">
+                    Application record</p>
+                <h1 style="margin: 0;">{{ application.job.title }}</h1>
+            </div>
+            <div>
+                <span class="pill pill-{{ application.ats_stage|lower }}">{{ application.get_ats_stage_display }}</span>
+            </div>
+        </div>
+
+        <div
+            style="display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap:16px; margin-bottom: 22px;">
+            <div class="card" style="padding:16px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
+                <div
+                    style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:#7a8797; font-weight:800;">
+                    Country</div>
+                <div style="font-weight:800; margin-top:6px;">{{ application.current_country|default:'Not provided' }}
+                </div>
+            </div>
+            <div class="card" style="padding:16px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
+                <div
+                    style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:#7a8797; font-weight:800;">
+                    City</div>
+                <div style="font-weight:800; margin-top:6px;">{{ application.city|default:'Not provided' }}</div>
+            </div>
+            <div class="card" style="padding:16px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
+                <div
+                    style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:#7a8797; font-weight:800;">
+                    Passport</div>
+                <div style="font-weight:800; margin-top:6px;">{{ application.passport_number|default:'Not provided' }}
+                </div>
+            </div>
+            <div class="card" style="padding:16px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
+                <div
+                    style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:#7a8797; font-weight:800;">
+                    Experience</div>
+                <div style="font-weight:800; margin-top:6px;">{{ application.years_of_experience }} years</div>
+            </div>
+            <div class="card" style="padding:16px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
+                <div
+                    style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:#7a8797; font-weight:800;">
+                    Document status</div>
+                <div style="font-weight:800; margin-top:6px;">{{ application.get_document_status_display }}</div>
+            </div>
+            <div class="card" style="padding:16px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
+                <div
+                    style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:#7a8797; font-weight:800;">
+                    Visa readiness</div>
+                <div style="font-weight:800; margin-top:6px;">{{ application.get_visa_readiness_display }}</div>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px;">
+            <div>
+                <h3 style="margin-top:0;">Cover letter</h3>
+                <div class="card"
+                    style="padding: 18px; border:1px solid #e5eaf0; border-radius:12px; background: #fff; line-height: 1.7; color: #334155; white-space: pre-line;">
+                    {{ application.cover_letter|default:'No cover letter supplied yet.' }}
+                </div>
+            </div>
+            <div>
+                <h3 style="margin-top:0;">Applicant details</h3>
+                <div class="card"
+                    style="padding: 18px; border:1px solid #e5eaf0; border-radius:12px; background: #fff;">
+                    <p><strong>Candidate:</strong> {{
+                        application.candidate.get_full_name|default:application.candidate.username }}</p>
+                    <p><strong>Email:</strong> {{ application.candidate.email }}</p>
+                    <p><strong>Assigned reviewer:</strong> {{ application.assigned_agent|default:'Not assigned yet' }}
+                    </p>
+                    <p><strong>Submitted:</strong> {{ application.created_at|date:'M d, Y' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if admin_form %}
+    <div class="card" style="padding:28px;">
+        <h2 style="margin-top:0;">Admin review & tracking</h2>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:18px;">
+                <div>
+                    <label for="{{ admin_form.ats_stage.id_for_label }}">ATS stage</label>
+                    {{ admin_form.ats_stage }}
+                </div>
+                <div>
+                    <label for="{{ admin_form.document_status.id_for_label }}">Document status</label>
+                    {{ admin_form.document_status }}
+                </div>
+                <div>
+                    <label for="{{ admin_form.visa_readiness.id_for_label }}">Visa readiness</label>
+                    {{ admin_form.visa_readiness }}
+                </div>
+            </div>
+            <div style="margin-top:18px;">
+                <label for="{{ admin_form.admin_notes.id_for_label }}">Admin notes</label>
+                {{ admin_form.admin_notes }}
+            </div>
+            <div style="margin-top:20px;">
+                <button type="submit" class="btn btn-primary">Save updates</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <div style="margin-top: 16px;">
+        <a href="{% url 'client:my_applications' %}" class="btn btn-secondary">Back to My Applications</a>
+    </div>
+</div>
+{% endblock %}

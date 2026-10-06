@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Document Vault · HBC Job Majuu{% endblock %}
+{% block content %}
+<div class="card" style="padding:28px;">
+    <h1 style="margin-top:0;">Document Vault</h1>
+    <p>Keep all candidate identity, qualification, and compliance records in a secure place for verification.</p>
+
+    <div class="row"
+        style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:20px;">
+        {% for item in required_docs %}
+        <div class="card" style="padding:18px;border:1px solid #e5eaf0;border-radius:12px; background:#fff;">
+            <strong>{{ item }}</strong>
+            <p style="margin:8px 0 0; color:#64748b;">Status: {% if forloop.counter <= 2 %}Uploaded{% else %}Pending
+                    upload{% endif %}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if applications %}
+    <div style="margin-top:30px;">
+        <h3 style="margin-bottom:12px;">Submitted application records</h3>
+        <div style="display:grid; gap:12px;">
+            {% for app in applications %}
+            <div class="card"
+                style="padding:16px 18px; border:1px solid #e5eaf0; border-radius:12px; background:#fff; display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap;">
+                <div>
+                    <div style="font-weight:800; color:#172033;">{{ app.job.title }}</div>
+                    <div style="font-size:0.84rem; color:#64748b;">{{ app.current_country|default:'Country pending' }} ·
+                        {{ app.passport_number|default:'Passport pending' }}</div>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                    <span class="pill pill-{{ app.ats_stage|lower }}">{{ app.get_ats_stage_display }}</span>
+                    <a href="{% url 'client:application_detail' app.id %}" class="btn btn-secondary">Open record</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div style="margin-top:22px;">
+        <a href="{% url 'client:dashboard' %}" class="btn btn-primary">Return to dashboard</a>
+    </div>
+</div>
+{% endblock %}

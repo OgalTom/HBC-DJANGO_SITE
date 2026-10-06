@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div style="display:grid; gap:22px;">
+    <section class="card" style="padding:28px;">
+        <h1 style="margin-top:0;">Application review</h1>
+        <p>Review the candidate profile and confirm the appropriate ATS stage for this opportunity.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-top:18px;">
+            <div class="card" style="padding:16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px;">
+                <span
+                    style="font-size:.74rem; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:#64748b;">Candidate</span>
+                <strong style="display:block; margin-top:8px;">{{ candidate.get_full_name|default:candidate.email
+                    }}</strong>
+            </div>
+            <div class="card" style="padding:16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px;">
+                <span
+                    style="font-size:.74rem; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:#64748b;">Position</span>
+                <strong style="display:block; margin-top:8px;">{{ application.job.title }}</strong>
+            </div>
+            <div class="card" style="padding:16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px;">
+                <span
+                    style="font-size:.74rem; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:#64748b;">Current
+                    stage</span>
+                <strong style="display:block; margin-top:8px;">{{ application.get_ats_stage_display }}</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="card" style="padding:24px;">
+        <h2 style="margin-top:0;">Candidate summary</h2>
+        <p><strong>Email:</strong> {{ candidate.email }}</p>
+        <p><strong>Phone:</strong> {{ candidate.phone_number }}</p>
+        <p><strong>Membership:</strong> {{ candidate.get_membership_tier_display }}</p>
+    </section>
+
+    {% if user.role == 'ADMIN_HANDLER' %}
+    <section class="card" style="padding:24px;">
+        <h2 style="margin-top:0;">Assign and escalate</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div style="display:grid; gap:16px; max-width:420px;">
+                <div>
+                    <label for="id_assigned_agent">Assigned partner</label>
+                    {{ form.assigned_agent }}
+                </div>
+                <div>
+                    <label for="id_ats_stage">ATS stage</label>
+                    {{ form.ats_stage }}
+                </div>
+                <button type="submit" class="btn btn-primary">Update review</button>
+            </div>
+        </form>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

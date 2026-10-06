@@ -1,0 +1,727 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard · HBC Job Majuu{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ============================================================
+       DASHBOARD
+    ============================================================ */
+    .dash-hero {
+        background: linear-gradient(135deg, #0f4c81 0%, #102a43 100%);
+        color: #ffffff;
+        border-radius: 18px;
+        padding: 34px 34px 32px;
+        margin-bottom: 26px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dash-hero::after {
+        content: "";
+        position: absolute;
+        right: -80px;
+        top: -80px;
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .dash-hero::before {
+        content: "";
+        position: absolute;
+        left: -60px;
+        bottom: -60px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    .dash-hero-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .dash-hero h1 {
+        color: #ffffff;
+        font-size: clamp(1.5rem, 2.4vw, 2rem);
+        letter-spacing: -0.5px;
+        margin-bottom: 6px;
+    }
+
+    .dash-hero p {
+        color: rgba(255, 255, 255, 0.78);
+        margin: 0;
+        font-size: 0.96rem;
+        max-width: 60ch;
+    }
+
+    .dash-hero-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .dash-hero-actions .btn-hero {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 18px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 800;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.2s ease,
+            background 0.2s ease;
+    }
+
+    .btn-hero.primary {
+        background: #ffffff;
+        color: #0f4c81;
+    }
+
+    .btn-hero.primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-hero.ghost {
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .btn-hero.ghost:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ---------- Stat grid ---------- */
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e5eaf0;
+        border-radius: 14px;
+        padding: 20px 22px;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+    }
+
+    .stat-label {
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: #7a8797;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: #172033;
+        letter-spacing: -0.5px;
+        line-height: 1.1;
+    }
+
+    .stat-meta {
+        font-size: 0.82rem;
+        color: #64748b;
+    }
+
+    .stat-card.accent {
+        background: linear-gradient(180deg, #f0f9ff, #ffffff);
+        border-color: #bfdbfe;
+    }
+
+    .stat-card.accent .stat-value {
+        color: #0f4c81;
+    }
+
+    /* ---------- Layout: main + sidebar ---------- */
+    .dash-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 22px;
+    }
+
+    @media (max-width: 900px) {
+        .dash-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .dash-section {
+        background: #ffffff;
+        border: 1px solid #e5eaf0;
+        border-radius: 14px;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+        overflow: hidden;
+        margin-bottom: 22px;
+    }
+
+    .dash-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 22px;
+        border-bottom: 1px solid #eef2f7;
+    }
+
+    .dash-section-header h2 {
+        font-size: 1.05rem;
+        margin: 0;
+        letter-spacing: -0.2px;
+    }
+
+    .dash-section-header a {
+        font-size: 0.84rem;
+        font-weight: 800;
+        color: #0f4c81;
+    }
+
+    .dash-section-header a:hover {
+        text-decoration: underline;
+    }
+
+    .dash-section-body {
+        padding: 20px 22px;
+    }
+
+    /* ---------- Applications list ---------- */
+    .app-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 0;
+        border-bottom: 1px solid #eef2f7;
+    }
+
+    .app-row:last-child {
+        border-bottom: none;
+    }
+
+    .app-avatar {
+        flex-shrink: 0;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #0f766e, #0f4c81);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 0.95rem;
+    }
+
+    .app-body {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .app-title {
+        font-weight: 800;
+        color: #172033;
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .app-meta {
+        font-size: 0.8rem;
+        color: #7a8797;
+    }
+
+    /* ATS stage pills */
+    .pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .pill-submitted {
+        background: #eef2f7;
+        color: #475569;
+    }
+
+    .pill-vetting {
+        background: #eff6ff;
+        color: #1e40af;
+    }
+
+    .pill-agent_review {
+        background: #f5f3ff;
+        color: #5b21b6;
+    }
+
+    .pill-interview {
+        background: #fffbeb;
+        color: #92400e;
+    }
+
+    .pill-offer {
+        background: #ecfdf5;
+        color: #065f46;
+    }
+
+    .pill-visa {
+        background: #f0f9ff;
+        color: #0369a1;
+    }
+
+    .pill-deployed {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .pill-rejected {
+        background: #fef2f2;
+        color: #991b1b;
+    }
+
+    /* ---------- Empty state ---------- */
+    .empty {
+        text-align: center;
+        padding: 34px 20px;
+        color: #7a8797;
+    }
+
+    .empty-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #eef6fb;
+        color: #0f4c81;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 14px;
+    }
+
+    .empty h3 {
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+
+    .empty p {
+        font-size: 0.88rem;
+        margin: 0 0 16px;
+    }
+
+    /* ---------- Profile completion ---------- */
+    .progress {
+        height: 9px;
+        background: #eef2f7;
+        border-radius: 999px;
+        overflow: hidden;
+        margin: 8px 0 12px;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #0f766e, #0f4c81);
+        border-radius: 999px;
+        transition: width 0.5s ease;
+    }
+
+    /* ---------- Tier card ---------- */
+    .tier-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px 0;
+        border-bottom: 1px solid #eef2f7;
+    }
+
+    .tier-row:last-child {
+        border-bottom: none;
+    }
+
+    .tier-info strong {
+        display: block;
+        font-size: 0.9rem;
+        color: #172033;
+    }
+
+    .tier-info span {
+        display: block;
+        font-size: 0.78rem;
+        color: #7a8797;
+        margin-top: 2px;
+    }
+
+    .tier-status {
+        font-size: 0.72rem;
+        font-weight: 800;
+        padding: 4px 10px;
+        border-radius: 999px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        white-space: nowrap;
+    }
+
+    .tier-status.done {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .tier-status.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .tier-status.locked {
+        background: #eef2f7;
+        color: #64748b;
+    }
+
+    /* ---------- Quick links ---------- */
+    .quick-links {
+        display: grid;
+        gap: 8px;
+    }
+
+    .quick-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        border-radius: 10px;
+        border: 1px solid #e5eaf0;
+        background: #ffffff;
+        color: #465468;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: background 0.15s ease, border-color 0.15s ease,
+            transform 0.15s ease, color 0.15s ease;
+    }
+
+    .quick-link:hover {
+        background: #eef6fb;
+        border-color: #bfdbfe;
+        color: #0f4c81;
+        transform: translateX(2px);
+    }
+
+    .quick-link .ql-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #eef6fb;
+        color: #0f4c81;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        flex-shrink: 0;
+    }
+
+    /* ---------- Recommended jobs ---------- */
+    .job-mini {
+        padding: 14px 0;
+        border-bottom: 1px solid #eef2f7;
+    }
+
+    .job-mini:last-child {
+        border-bottom: none;
+    }
+
+    .job-mini-title {
+        font-weight: 800;
+        color: #172033;
+        font-size: 0.93rem;
+        margin-bottom: 2px;
+    }
+
+    .job-mini-meta {
+        font-size: 0.8rem;
+        color: #7a8797;
+        margin-bottom: 6px;
+    }
+
+    .job-mini-tag {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        padding: 3px 9px;
+        border-radius: 999px;
+        background: #eef6fb;
+        color: #0f4c81;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ==================== HERO ==================== -->
+<section class="dash-hero">
+    <div class="dash-hero-inner">
+        <div>
+            <h1>
+                Welcome back, {{ user.first_name|default:user.username }} 👋
+            </h1>
+            <p>
+                Track your applications, complete your profile, and move closer to your
+                overseas placement.
+            </p>
+        </div>
+        <div class="dash-hero-actions">
+            <a href="{% url 'client:jobs' %}" class="btn-hero primary">
+                🔍 Browse Jobs
+            </a>
+            <a href="{% url 'client:visa_readiness' %}" class="btn-hero ghost">
+                ✈️ Visa Readiness
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== STATS ==================== -->
+<section class="stat-grid">
+    <div class="stat-card">
+        <span class="stat-label">Applications</span>
+        <span class="stat-value">{{ total_applications }}</span>
+        <span class="stat-meta">{{ active_applications }} active</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Deployed</span>
+        <span class="stat-value">{{ deployed_count }}</span>
+        <span class="stat-meta">Successful placements</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Total Paid</span>
+        <span class="stat-value">KES {{ total_paid|floatformat:0 }}</span>
+        <span class="stat-meta">
+            {% if tier_1_paid %}Tier 1 active{% else %}Tier 1 not active{% endif %}
+        </span>
+    </div>
+    <div class="stat-card accent">
+        <span class="stat-label">Profile</span>
+        <span class="stat-value">{{ profile_score }}%</span>
+        <span class="stat-meta">Complete your profile</span>
+    </div>
+</section>
+
+<!-- ==================== MAIN GRID ==================== -->
+<div class="dash-grid">
+
+    <!-- ========== LEFT COLUMN ========== -->
+    <div>
+
+        <!-- Recent applications -->
+        <section class="dash-section">
+            <div class="dash-section-header">
+                <h2>Recent Applications</h2>
+                <a href="{% url 'client:my_applications' %}">View all →</a>
+            </div>
+            <div class="dash-section-body">
+
+                {% if recent_applications %}
+                {% for app in recent_applications %}
+                <div class="app-row">
+                    <div class="app-avatar">
+                        {{ app.job.title|slice:":1"|upper }}
+                    </div>
+                    <div class="app-body">
+                        <div class="app-title">{{ app.job.title }}</div>
+                        <div class="app-meta">
+                            {{ app.job.country }} · {{ app.job.sector }} ·
+                            Updated {{ app.updated_at|timesince }} ago
+                        </div>
+                    </div>
+                    <span class="pill pill-{{ app.ats_stage|lower }}">
+                        {{ app.get_ats_stage_display }}
+                    </span>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty">
+                    <div class="empty-icon">📄</div>
+                    <h3>No applications yet</h3>
+                    <p>Start by browsing verified international jobs and applying.</p>
+                    <a href="{% url 'client:jobs' %}" class="btn btn-primary">Browse Jobs</a>
+                </div>
+                {% endif %}
+
+            </div>
+        </section>
+
+        <!-- Recommended jobs -->
+        <section class="dash-section">
+            <div class="dash-section-header">
+                <h2>Recommended for You</h2>
+                <a href="{% url 'client:jobs' %}">See more →</a>
+            </div>
+            <div class="dash-section-body">
+                {% if recommended_jobs %}
+                {% for job in recommended_jobs %}
+                <div class="job-mini">
+                    <div class="job-mini-title">{{ job.title }}</div>
+                    <div class="job-mini-meta">
+                        {{ job.country }} · {{ job.sector }}
+                        {% if job.salary_disclosed and job.salary_range %}
+                        · {{ job.salary_range }}
+                        {% endif %}
+                    </div>
+                    <span class="job-mini-tag">{{ job.country }}</span>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty">
+                    <div class="empty-icon">🌍</div>
+                    <h3>No new jobs right now</h3>
+                    <p>Check back soon — new international roles are added weekly.</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Tier progression -->
+        <section class="dash-section">
+            <div class="dash-section-header">
+                <h2>Your Placement Tiers</h2>
+                <a href="{% url 'client:payments' %}">Payments →</a>
+            </div>
+            <div class="dash-section-body">
+
+                <div class="tier-row">
+                    <div class="tier-info">
+                        <strong>Tier 1 — Membership</strong>
+                        <span>Unlock full job details & recruiter matching</span>
+                    </div>
+                    {% if tier_1_paid %}
+                    <span class="tier-status done">Active</span>
+                    {% else %}
+                    <span class="tier-status pending">Pending</span>
+                    {% endif %}
+                </div>
+
+                <div class="tier-row">
+                    <div class="tier-info">
+                        <strong>Tier 2 — Verification</strong>
+                        <span>Document authentication & ATS submission</span>
+                    </div>
+                    {% if tier_2_active %}
+                    <span class="tier-status done">Active</span>
+                    {% else %}
+                    <span class="tier-status locked">Locked</span>
+                    {% endif %}
+                </div>
+
+                <div class="tier-row">
+                    <div class="tier-info">
+                        <strong>Tier 3 — Placement</strong>
+                        <span>Visa processing, travel & relocation</span>
+                    </div>
+                    {% if tier_3_active %}
+                    <span class="tier-status done">Active</span>
+                    {% else %}
+                    <span class="tier-status locked">Locked</span>
+                    {% endif %}
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ========== RIGHT COLUMN ========== -->
+    <div>
+
+        <!-- Profile completion -->
+        <section class="dash-section">
+            <div class="dash-section-header">
+                <h2>Profile Completion</h2>
+                <a href="{% url 'client:profile' %}">Edit →</a>
+            </div>
+            <div class="dash-section-body">
+                <div style="font-size:0.86rem;color:#64748b;">
+                    Your profile is <strong>{{ profile_score }}%</strong> complete.
+                </div>
+                <div class="progress">
+                    <div class="progress-bar" style="width: {{ profile_score }}%;"></div>
+                </div>
+                <a href="{% url 'client:profile' %}" class="btn btn-secondary"
+                    style="width:100%;justify-content:center;">
+                    Complete Profile
+                </a>
+            </div>
+        </section>
+
+        <!-- Quick links -->
+        <section class="dash-section">
+            <div class="dash-section-header">
+                <h2>Quick Actions</h2>
+            </div>
+            <div class="dash-section-body">
+                <div class="quick-links">
+                    <a href="{% url 'client:document_vault' %}" class="quick-link">
+                        <span class="ql-icon">🔒</span> Document Vault
+                    </a>
+                    <a href="{% url 'client:visa_readiness' %}" class="quick-link">
+                        <span class="ql-icon">✅</span> Visa Readiness Check
+                    </a>
+                    <a href="{% url 'client:payments' %}" class="quick-link">
+                        <span class="ql-icon">💳</span> Payments &amp; Receipts
+                    </a>
+                    <a href="{% url 'client:my_applications' %}" class="quick-link">
+                        <span class="ql-icon">📋</span> All Applications
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Support -->
+        <section class="dash-section">
+            <div class="dash-section-header">
+                <h2>Need Help?</h2>
+            </div>
+            <div class="dash-section-body">
+                <p style="font-size:0.88rem;margin-bottom:14px;">
+                    Our team is here to guide you through every step of your journey.
+                </p>
+                <a href="mailto:support@hbcjobmajuu.com" class="btn btn-secondary"
+                    style="width:100%;justify-content:center;">
+                    Contact Support
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+{% endblock %}

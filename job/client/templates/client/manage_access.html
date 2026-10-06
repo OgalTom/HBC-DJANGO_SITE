@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Manage Access · HBC Job Majuu{% endblock %}
+{% block content %}
+<div style="display:grid; gap:22px;">
+    <section class="card" style="padding:28px;">
+        <h1 style="margin-top:0;">Manage user access</h1>
+        <p>Grant or revoke Tier 1, Tier 2, and Tier 3 access based on verified payment or manual admin approval.</p>
+        <a href="{% url 'client:admin_dashboard' %}" class="btn btn-secondary">Back to admin</a>
+    </section>
+
+    <section class="card" style="padding:24px;">
+        <h2 style="margin-top:0;">Unlock a candidate</h2>
+        <form method="post" style="display:grid; gap:16px;">
+            {% csrf_token %}
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+                <div>
+                    <label for="user_id">Candidate</label>
+                    <select id="user_id" name="user_id" class="form-input" required>
+                        {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.get_full_name|default:user.email }} · {{ user.email }}
+                        </option>
+                        {% empty %}
+                        <option value="">No users found</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="tier">Tier</label>
+                    <select id="tier" name="tier" class="form-input" required>
+                        {% for value, label in tiers %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="source">Source</label>
+                    <select id="source" name="source" class="form-input">
+                        {% for value, label in sources %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="payment_reference">Payment reference</label>
+                    <input id="payment_reference" type="text" name="payment_reference" class="form-input"
+                        placeholder="e.g. MPESA TXN123" />
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+                <div>
+                    <label for="notes">Admin notes</label>
+                    <textarea id="notes" name="notes" rows="4" class="form-input"
+                        placeholder="Verified payment, offline receipt, or manual approval details"></textarea>
+                </div>
+                <div>
+                    <label>&nbsp;</label>
+                    <label
+                        style="display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc;">
+                        <input type="checkbox" name="is_active" checked />
+                        Active access
+                    </label>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-primary">Save access</button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,688 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{% if active_tab == "register" %}Create Account{% else %}Sign In{% endif %} · HBC Job Majuu
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ============================================================
+       AUTH PAGE
+    ============================================================ */
+    .auth-wrap {
+        display: grid;
+        grid-template-columns: 1.05fr 1fr;
+        gap: 48px;
+        align-items: stretch;
+        max-width: 1080px;
+        margin: 0 auto;
+    }
+
+    /* ---------- Left brand panel ---------- */
+    .auth-aside {
+        position: relative;
+        border-radius: 18px;
+        padding: 44px 40px;
+        color: #ffffff;
+        background:
+            radial-gradient(circle at 20% 20%, rgba(15, 118, 110, 0.55), transparent 55%),
+            radial-gradient(circle at 80% 80%, rgba(15, 76, 129, 0.75), transparent 55%),
+            linear-gradient(135deg, #0f4c81 0%, #102a43 100%);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 560px;
+    }
+
+    .auth-aside::after {
+        content: "";
+        position: absolute;
+        right: -60px;
+        top: -60px;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .auth-aside::before {
+        content: "";
+        position: absolute;
+        left: -80px;
+        bottom: -80px;
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    .aside-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        letter-spacing: -0.3px;
+    }
+
+    .aside-brand .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: linear-gradient(180deg, #14b8a6, #0f766e);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 900;
+    }
+
+    .aside-hero h2 {
+        color: #ffffff;
+        font-size: clamp(1.7rem, 2.6vw, 2.3rem);
+        letter-spacing: -0.6px;
+        margin-bottom: 14px;
+        line-height: 1.2;
+    }
+
+    .aside-hero p {
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.98rem;
+        max-width: 44ch;
+        margin-bottom: 26px;
+    }
+
+    .aside-features {
+        display: grid;
+        gap: 12px;
+    }
+
+    .aside-features li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 0.92rem;
+    }
+
+    .aside-features li span.dot {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.14);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 900;
+        margin-top: 3px;
+    }
+
+    .aside-footnote {
+        font-size: 0.78rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 28px;
+    }
+
+    /* ---------- Right form card ---------- */
+    .auth-card {
+        background: #ffffff;
+        border: 1px solid #e5eaf0;
+        border-radius: 18px;
+        padding: 32px 32px 36px;
+        box-shadow: 0 12px 40px rgba(15, 23, 42, 0.06);
+    }
+
+    .auth-tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 5px;
+        margin-bottom: 26px;
+    }
+
+    .auth-tab {
+        text-align: center;
+        padding: 9px 12px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #64748b;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        font-family: inherit;
+        transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .auth-tab:hover {
+        color: #0f4c81;
+    }
+
+    .auth-tab.active {
+        background: #ffffff;
+        color: #0f4c81;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+    }
+
+    .auth-panel {
+        display: none;
+    }
+
+    .auth-panel.active {
+        display: block;
+        animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(4px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .auth-card h1 {
+        font-size: 1.6rem;
+        margin-bottom: 6px;
+        letter-spacing: -0.4px;
+    }
+
+    .auth-card .subtitle {
+        color: #7a8persist699;
+        font-size: 0.92rem;
+        margin-bottom: 24px;
+    }
+
+    .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .field {
+        margin-bottom: 16px;
+    }
+
+    .field label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: #344054;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #d7dee8;
+        border-radius: 10px;
+        background: #ffffff;
+        color: #172033;
+        font-family: inherit;
+        font-size: 0.94rem;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s;
+    }
+
+    .form-input::placeholder {
+        color: #9aa6b6;
+    }
+
+    .form-input:focus {
+        border-color: #0f4c81;
+        box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.12);
+        background: #fbfdff;
+    }
+
+    .field-error {
+        display: block;
+        margin-top: 6px;
+        font-size: 0.8rem;
+        color: #b91c1c;
+        font-weight: 600;
+    }
+
+    .form-input.has-error {
+        border-color: #fca5a5;
+        background: #fff7f7;
+    }
+
+    .form-row-between {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 6px 0 20px;
+        font-size: 0.86rem;
+    }
+
+    .remember {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #526174;
+        font-weight: 600;
+    }
+
+    .remember input {
+        width: auto;
+        accent-color: #0f4c81;
+    }
+
+    .forgot {
+        color: #0f4c81;
+        font-weight: 700;
+    }
+
+    .forgot:hover {
+        text-decoration: underline;
+    }
+
+    .btn-block {
+        width: 100%;
+        padding: 12px 18px;
+        border-radius: 10px;
+        font-weight: 800;
+        font-size: 0.96rem;
+        letter-spacing: 0.1px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s;
+    }
+
+    .btn-block.primary {
+        background: linear-gradient(180deg, #0f4c81, #0b3b65);
+        color: #ffffff;
+    }
+
+    .btn-block.primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 24px rgba(15, 76, 129, 0.28);
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 22px 0 18px;
+        color: #94a3b8;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #e5eaf0;
+    }
+
+    .auth-alt {
+        text-align: center;
+        font-size: 0.88rem;
+        color: #64748b;
+    }
+
+    .auth-alt a {
+        color: #0f4c81;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .auth-alt a:hover {
+        text-decoration: underline;
+    }
+
+    .nonfield-errors {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+        padding: 11px 14px;
+        border-radius: 10px;
+        margin-bottom: 18px;
+        font-size: 0.87rem;
+        font-weight: 600;
+    }
+
+    .btn-google {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 11px 18px;
+        border: 1px solid #d7dee8;
+        border-radius: 10px;
+        background: #ffffff;
+        color: #344054;
+        font-size: 0.94rem;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease,
+            box-shadow 0.2s ease, transform 0.15s ease;
+    }
+
+    .btn-google:hover {
+        background: #f8fafc;
+        border-color: #c3d2e2;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .btn-google svg {
+        flex-shrink: 0;
+    }
+
+    .google-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 18px 0;
+        color: #94a3b8;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+    }
+
+    .google-divider::before,
+    .google-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #e5eaf0;
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 900px) {
+        .auth-wrap {
+            grid-template-columns: 1fr;
+            gap: 26px;
+        }
+
+        .auth-aside {
+            min-height: auto;
+            padding: 32px 26px;
+        }
+
+        .aside-features {
+            display: none;
+        }
+    }
+
+    @media (max-width: 520px) {
+        .auth-card {
+            padding: 24px 20px 28px;
+        }
+
+        .field-row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+
+    <!-- ================= LEFT: Brand panel ================= -->
+    <aside class="auth-aside">
+        <div>
+            <div class="aside-brand">
+                <span class="brand-mark">H</span>
+                HBC Job Majuu
+            </div>
+        </div>
+
+        <div class="aside-hero">
+            <h2>Your gateway to verified overseas careers.</h2>
+            <p>
+                Ethical, structured, and NEAIMS-compliant international recruitment —
+                connecting Kenyan professionals with trusted employers in Europe,
+                the United States, and beyond.
+            </p>
+
+            <ul class="aside-features">
+                <li><span class="dot">✓</span> Verified employers &amp; partner agencies</li>
+                <li><span class="dot">✓</span> Real-time ATS application tracking</li>
+                <li><span class="dot">✓</span> Encrypted document vault</li>
+                <li><span class="dot">✓</span> Transparent 3-tier fee model</li>
+                <li><span class="dot">✓</span> CPD-powered pre-departure training</li>
+            </ul>
+        </div>
+
+        <p class="aside-footnote">
+            Registered under the National Employment Authority (NEAIMS), Kenya.
+        </p>
+    </aside>
+
+    <!-- ================= RIGHT: Form card ================= -->
+    <section class="auth-card">
+
+        <div class="auth-tabs" role="tablist">
+            <button type="button" class="auth-tab {% if active_tab != 'register' %}active{% endif %}" data-tab="login"
+                role="tab">Sign In</button>
+            <button type="button" class="auth-tab {% if active_tab == 'register' %}active{% endif %}"
+                data-tab="register" role="tab">Create Account</button>
+        </div>
+
+        <!-- ============ LOGIN PANEL ============ -->
+        <div class="auth-panel {% if active_tab != 'register' %}active{% endif %}" data-panel="login">
+            <h1>Welcome back</h1>
+            <p class="subtitle">Sign in to continue your journey.</p>
+
+            <a href="{% url 'client:google_login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}"
+                class="btn-google">
+                <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+                    <path fill="#FFC107"
+                        d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.3 6.1 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z" />
+                    <path fill="#FF3D00"
+                        d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.3 6.1 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+                    <path fill="#4CAF50"
+                        d="M24 44c5.3 0 10.1-2 13.7-5.3l-6.3-5.3c-2 1.5-4.6 2.4-7.4 2.4-5.2 0-9.6-3.3-11.2-7.9l-6.5 5C9.6 39.6 16.2 44 24 44z" />
+                    <path fill="#1976D2"
+                        d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.5l6.3 5.3C41.9 35.6 44 30.2 44 24c0-1.2-.1-2.4-.4-3.5z" />
+                </svg>
+                <span>Continue with Google</span>
+            </a>
+            <form method="post" action="{% url 'client:login' %}" novalidate>
+                {% csrf_token %}
+
+                {% if login_form.non_field_errors %}
+                <div class="nonfield-errors">
+                    {% for err in login_form.non_field_errors %}{{ err }}{% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="field">
+                    <label for="{{ login_form.username.id_for_label }}">Email or Username</label>
+                    {{ login_form.username }}
+                    {% if login_form.username.errors %}
+                    <span class="field-error">{{ login_form.username.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="field">
+                    <label for="{{ login_form.password.id_for_label }}">Password</label>
+                    {{ login_form.password }}
+                    {% if login_form.password.errors %}
+                    <span class="field-error">{{ login_form.password.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-row-between">
+                    <label class="remember">
+                        <input type="checkbox" name="remember_me"> Remember me
+                    </label>
+                    <a href="#" class="forgot">Forgot password?</a>
+                </div>
+
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+
+                <button type="submit" class="btn-block primary">Sign In</button>
+            </form>
+
+            <div class="divider">New here?</div>
+            <p class="auth-alt">
+                Don't have an account?
+                <a data-switch="register">Create one in under a minute</a>
+            </p>
+        </div>
+
+        <!-- ============ REGISTER PANEL ============ -->
+        <div class="auth-panel {% if active_tab == 'register' %}active{% endif %}" data-panel="register">
+            <h1>Create your account</h1>
+            <p class="subtitle">Start applying to verified international jobs.</p>
+            <a href="{% url 'client:google_login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}"
+                class="btn-google">
+                <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+                    <path fill="#FFC107"
+                        d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.3 6.1 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z" />
+                    <path fill="#FF3D00"
+                        d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.3 6.1 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+                    <path fill="#4CAF50"
+                        d="M24 44c5.3 0 10.1-2 13.7-5.3l-6.3-5.3c-2 1.5-4.6 2.4-7.4 2.4-5.2 0-9.6-3.3-11.2-7.9l-6.5 5C9.6 39.6 16.2 44 24 44z" />
+                    <path fill="#1976D2"
+                        d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.5l6.3 5.3C41.9 35.6 44 30.2 44 24c0-1.2-.1-2.4-.4-3.5z" />
+                </svg>
+                <span>Continue with Google</span>
+            </a>
+            <form method="post" action="{% url 'client:register' %}" novalidate>
+                {% csrf_token %}
+
+                {% if register_form.non_field_errors %}
+                <div class="nonfield-errors">
+                    {% for err in register_form.non_field_errors %}{{ err }}{% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="{{ register_form.first_name.id_for_label }}">First name</label>
+                        {{ register_form.first_name }}
+                        {% if register_form.first_name.errors %}
+                        <span class="field-error">{{ register_form.first_name.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="field">
+                        <label for="{{ register_form.last_name.id_for_label }}">Last name</label>
+                        {{ register_form.last_name }}
+                        {% if register_form.last_name.errors %}
+                        <span class="field-error">{{ register_form.last_name.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="{{ register_form.email.id_for_label }}">Email address</label>
+                    {{ register_form.email }}
+                    {% if register_form.email.errors %}
+                    <span class="field-error">{{ register_form.email.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="field">
+                    <label for="{{ register_form.phone_number.id_for_label }}">Phone number</label>
+                    {{ register_form.phone_number }}
+                    {% if register_form.phone_number.errors %}
+                    <span class="field-error">{{ register_form.phone_number.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="{{ register_form.password1.id_for_label }}">Password</label>
+                        {{ register_form.password1 }}
+                        {% if register_form.password1.errors %}
+                        <span class="field-error">{{ register_form.password1.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="field">
+                        <label for="{{ register_form.password2.id_for_label }}">Confirm password</label>
+                        {{ register_form.password2 }}
+                        {% if register_form.password2.errors %}
+                        <span class="field-error">{{ register_form.password2.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-block primary" style="margin-top:8px;">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="divider">Already registered?</div>
+            <p class="auth-alt">
+                Have an account?
+                <a data-switch="login">Sign in instead</a>
+            </p>
+        </div>
+
+    </section>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tabs = document.querySelectorAll(".auth-tab");
+        const panels = document.querySelectorAll(".auth-panel");
+        const switchers = document.querySelectorAll("[data-switch]");
+
+        if (!tabs.length || !panels.length) return; // nothing to do
+
+        function activate(name) {
+            if (!name) return;
+            tabs.forEach(function (t) {
+                t.classList.toggle("active", t.dataset.tab === name);
+            });
+            panels.forEach(function (p) {
+                p.classList.toggle("active", p.dataset.panel === name);
+            });
+            if (history.replaceState) {
+                history.replaceState(null, "", "#" + name);
+            } else {
+                window.location.hash = name;
+            }
+        }
+
+        tabs.forEach(function (t) {
+            t.addEventListener("click", function () {
+                activate(t.dataset.tab);
+            });
+        });
+
+        switchers.forEach(function (s) {
+            s.addEventListener("click", function (e) {
+                e.preventDefault();
+                activate(s.dataset.switch);
+            });
+        });
+
+        // Server tells us which tab should be active on load.
+        // This is safe: Django only substitutes the string, JS reads it.
+        const activeTab = "{{ active_tab|default:'login'|escapejs }}";
+
+        // URL hash wins if present (so refresh keeps the tab)
+        const hashTab = (window.location.hash || "").replace("#", "");
+
+        if (hashTab === "register" || hashTab === "login") {
+            activate(hashTab);
+        } else if (activeTab === "register") {
+            activate("register");
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Application form · HBC Job Majuu{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div class="card" style="padding: 28px;">
+        <div style="margin-bottom: 18px;">
+            <a href="{% url 'client:job_detail' job.id %}" class="btn btn-secondary" style="margin-bottom: 12px;">← Back
+                to job</a>
+            <h1 style="margin-top: 0; margin-bottom: 8px;">Application form</h1>
+            <p style="margin: 0; color: #48607a;">Complete your application for <strong>{{ job.title }}</strong> in {{
+                job.country }}.</p>
+        </div>
+
+        {% if form.errors %}
+        <div class="alert alert-error"
+            style="margin-bottom: 18px; background: #fff2f2; border: 1px solid #fecaca; color: #9f1239; padding: 12px 14px; border-radius: 10px;">
+            Please correct the highlighted fields below.
+        </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px;">
+                <div>
+                    <label for="{{ form.current_country.id_for_label }}">Current country</label>
+                    {{ form.current_country }}
+                    {% if form.current_country.errors %}
+                    <div class="field-error">{{ form.current_country.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.city.id_for_label }}">City</label>
+                    {{ form.city }}
+                    {% if form.city.errors %}
+                    <div class="field-error">{{ form.city.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.passport_number.id_for_label }}">Passport number</label>
+                    {{ form.passport_number }}
+                    {% if form.passport_number.errors %}
+                    <div class="field-error">{{ form.passport_number.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.years_of_experience.id_for_label }}">Years of experience</label>
+                    {{ form.years_of_experience }}
+                    {% if form.years_of_experience.errors %}
+                    <div class="field-error">{{ form.years_of_experience.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <label for="{{ form.visa_readiness.id_for_label }}">Visa readiness</label>
+                {{ form.visa_readiness }}
+                {% if form.visa_readiness.errors %}
+                <div class="field-error">{{ form.visa_readiness.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div style="margin-top: 20px;">
+                <label for="{{ form.cover_letter.id_for_label }}">Cover letter</label>
+                {{ form.cover_letter }}
+                {% if form.cover_letter.errors %}
+                <div class="field-error">{{ form.cover_letter.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                <button type="submit" class="btn btn-primary">Submit application</button>
+                <a href="{% url 'client:job_detail' job.id %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

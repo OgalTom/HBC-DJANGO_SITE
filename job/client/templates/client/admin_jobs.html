@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Job management · HBC Job Majuu{% endblock %}
+{% block content %}
+<div style="display:grid; gap:22px;">
+    <section class="card" style="padding:28px;">
+        <div
+            style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px;">
+            <div>
+                <h1 style="margin:0;">Job management</h1>
+                <p style="margin:0;">Create public roles and member-only opportunities, then assign them to the right
+                    review queue.</p>
+            </div>
+        </div>
+
+        <form method="post" style="display:grid; gap:18px;">
+            {% csrf_token %}
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;">
+                <div>
+                    <label for="id_title">Title</label>
+                    {{ job_form.title }}
+                </div>
+                <div>
+                    <label for="id_country">Country</label>
+                    {{ job_form.country }}
+                </div>
+                <div>
+                    <label for="id_sector">Sector</label>
+                    {{ job_form.sector }}
+                </div>
+                <div>
+                    <label for="id_status">Status</label>
+                    {{ job_form.status }}
+                </div>
+                <div>
+                    <label for="id_visibility">Visibility</label>
+                    {{ job_form.visibility }}
+                </div>
+                <div>
+                    <label for="id_salary_range">Salary range</label>
+                    {{ job_form.salary_range }}
+                </div>
+                <div>
+                    <label for="id_tier_2_fee">Tier 2 fee</label>
+                    {{ job_form.tier_2_fee }}
+                </div>
+                <div>
+                    <label for="id_tier_3_fee">Tier 3 fee</label>
+                    {{ job_form.tier_3_fee }}
+                </div>
+            </div>
+
+            <div style="display:grid; gap:16px;">
+                <div>
+                    <label for="id_description_masked">Short description</label>
+                    {{ job_form.description_masked }}
+                </div>
+                <div>
+                    <label for="id_description_full">Full description</label>
+                    {{ job_form.description_full }}
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+                <label style="display:flex; align-items:center; gap:10px; min-width:180px;">
+                    {{ job_form.salary_disclosed }}
+                    <span>Salary disclosed</span>
+                </label>
+                <button type="submit" class="btn btn-primary">Save job</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="card" style="padding:24px;">
+        <h2 style="margin-top:0;">Published roles</h2>
+        {% if jobs %}
+        <div style="display:grid; gap:12px;">
+            {% for job in jobs %}
+            <div class="card" style="padding:14px 16px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
+                <div
+                    style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+                    <div>
+                        <strong>{{ job.title }}</strong><br>
+                        <span style="font-size:.84rem;color:#64748b;">{{ job.country }} · {{ job.sector }} · {{
+                            job.get_visibility_display }}</span>
+                    </div>
+                    <span
+                        style="font-size:.75rem; font-weight:700; padding:6px 10px; border-radius:999px; background:#eef6fb; color:#0f4c81;">{{
+                        job.get_status_display }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No jobs published yet.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

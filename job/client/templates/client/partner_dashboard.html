@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Partner Dashboard · HBC Job Majuu{% endblock %}
+{% block content %}
+<div style="display:grid; gap:22px;">
+    <section class="card" style="padding:28px;">
+        <h1 style="margin-top:0;">Partner reviewer dashboard</h1>
+        <p>Review candidate workstreams assigned to your agency and track ATS progress for application decisions.</p>
+    </section>
+
+    <section class="card" style="padding:24px;">
+        <h2 style="margin-top:0;">Assigned applications</h2>
+        {% if assigned_apps %}
+        <div style="display:grid; gap:12px;">
+            {% for app in assigned_apps %}
+            <div class="card" style="padding:14px 16px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
+                <div style="display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+                    <div>
+                        <strong>{{ app.candidate.get_full_name|default:app.candidate.email }}</strong><br>
+                        <span style="color:#64748b; font-size:.86rem;">{{ app.job.title }}</span>
+                    </div>
+                    <div style="color:#475569; font-size:.86rem;">{{ app.get_ats_stage_display }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No applications assigned to you yet.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

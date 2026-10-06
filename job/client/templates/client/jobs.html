@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Jobs · HBC Job Majuu{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ---------- Page header ---------- */
+    .page-hero {
+        background: linear-gradient(135deg, #0f4c81 0%, #102a43 100%);
+        color: #ffffff;
+        border-radius: 18px;
+        padding: 32px 34px;
+        margin-bottom: 24px;
+    }
+
+    .page-hero h1 {
+        color: #ffffff;
+        font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+        letter-spacing: -0.6px;
+        margin-bottom: 6px;
+    }
+
+    .page-hero p {
+        color: rgba(255, 255, 255, 0.78);
+        margin: 0;
+        font-size: 0.96rem;
+    }
+
+    /* ---------- Filter bar ---------- */
+    .filter-bar {
+        background: #ffffff;
+        border: 1px solid #e5eaf0;
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+        margin-bottom: 22px;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 10px;
+    }
+
+    @media (max-width: 800px) {
+        .filter-bar {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .filter-bar input,
+    .filter-bar select {
+        width: 100%;
+        padding: 11px 13px;
+        border: 1px solid #d7dee8;
+        border-radius: 10px;
+        font-size: 0.92rem;
+        background: #ffffff;
+        font-family: inherit;
+        color: #172033;
+    }
+
+    .filter-bar button {
+        padding: 11px 22px;
+        border-radius: 10px;
+        background: #0f4c81;
+        color: #fff;
+        font-weight: 800;
+        font-size: 0.92rem;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .filter-bar button:hover {
+        background: #0b3b65;
+        transform: translateY(-1px);
+    }
+
+    .filter-summary {
+        font-size: 0.88rem;
+        color: #64748b;
+        margin-bottom: 16px;
+    }
+
+    .filter-summary strong {
+        color: #0f4c81;
+    }
+
+    /* ---------- Job cards ---------- */
+    .job-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 18px;
+    }
+
+    .job-card {
+        background: #ffffff;
+        border: 1px solid #e5eaf0;
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.15s ease, box-shadow 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+    .job-card:hover {
+        transform: translateY(-3px);
+        border-color: #bfdbfe;
+        box-shadow: 0 12px 30px rgba(15, 76, 129, 0.1);
+    }
+
+    .job-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .job-card-title {
+        font-weight: 800;
+        font-size: 1.02rem;
+        color: #172033;
+        letter-spacing: -0.2px;
+        line-height: 1.3;
+    }
+
+    .job-country-flag {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #0f766e, #0f4c81);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+
+    .job-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+
+    .job-tag {
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #eef6fb;
+        color: #0f4c81;
+    }
+
+    .job-tag.sector {
+        background: #ecfdf5;
+        color: #065f46;
+    }
+
+    .job-tag.members {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .job-tag.public {
+        background: #ecfeff;
+        color: #0f766e;
+    }
+
+    .job-card-desc {
+        font-size: 0.88rem;
+        color: #5b687a;
+        margin-bottom: 16px;
+        flex-grow: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .job-salary {
+        font-size: 0.92rem;
+        font-weight: 800;
+        color: #065f46;
+        margin-bottom: 16px;
+    }
+
+    .job-salary.masked {
+        color: #92400e;
+        background: #fffbeb;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* ---------- Empty state ---------- */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: #ffffff;
+        border: 1px solid #e5eaf0;
+        border-radius: 14px;
+    }
+
+    .empty-state .icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: #eef6fb;
+        color: #0f4c81;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        margin-bottom: 14px;
+    }
+
+    .empty-state h3 {
+        font-size: 1.1rem;
+    }
+
+    .empty-state p {
+        color: #7a8797;
+        font-size: 0.92rem;
+    }
+
+    /* ---------- Pagination ---------- */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 30px;
+    }
+
+    .pagination a,
+    .pagination span {
+        padding: 9px 14px;
+        border-radius: 8px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        border: 1px solid #e5eaf0;
+        background: #ffffff;
+        color: #465468;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .pagination a:hover {
+        background: #eef6fb;
+        color: #0f4c81;
+        border-color: #bfdbfe;
+    }
+
+    .pagination .current {
+        background: #0f4c81;
+        color: #ffffff;
+        border-color: #0f4c81;
+    }
+
+    .pagination .disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="page-hero">
+    <h1>Jobs across all sectors</h1>
+    <p>
+        Explore verified opportunities across healthcare, logistics, hospitality, construction, agriculture,
+        engineering, domestic work, and other labour categories with structured placement support.
+    </p>
+</section>
+
+<!-- FILTER BAR -->
+<!-- FILTER BAR -->
+<!-- <form method="get" class="filter-bar">
+    <input type="text" name="q" placeholder="Search job title, country, sector..." value="{{ q }}">
+
+    <select name="country">
+        <option value="" {% if not selected_country %}selected{% endif %}>All Countries</option>
+        {% for c in countries %}
+        <option value="{{ c }}" {% if selected_country == c %}selected{% endif %}>
+            {{ c }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <select name="sector">
+        <option value="" {% if not selected_sector %}selected{% endif %}>All Sectors</option>
+        {% for s in sectors %}
+        <option value="{{ s }}" {% if selected_sector == s %}selected{% endif %}>
+            {{ s }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Search</button>
+</form> -->
+
+<p class="filter-summary">
+    Showing <strong>{{ page_obj|length }}</strong> of
+    <strong>{{ total_jobs }}</strong> active position{{ total_jobs|pluralize }}.
+</p>
+
+<!-- JOB GRID -->
+{% if page_obj %}
+<div class="job-grid">
+    {% for job in page_obj %}
+    <article class="job-card">
+        <div class="job-card-top">
+            <div class="job-card-title">{{ job.title }}</div>
+            <div class="job-country-flag">{{ job.country|slice:":2"|upper }}</div>
+        </div>
+
+        <div class="job-tags">
+            <span class="job-tag">{{ job.country }}</span>
+            <span class="job-tag sector">{{ job.sector }}</span>
+            {% if job.visibility == 'MEMBERS_ONLY' %}
+            <span class="job-tag members">Members only</span>
+            {% else %}
+            <span class="job-tag public">Public</span>
+            {% endif %}
+        </div>
+
+        <p class="job-card-desc">{{ job.description_masked|truncatechars:180 }}</p>
+
+        {% if job.salary_disclosed and job.salary_range and is_member %}
+        <div class="job-salary">{{ job.salary_range }}</div>
+        {% elif job.salary_disclosed and job.salary_range %}
+        <div class="job-salary masked">🔒 Salary revealed for members</div>
+        {% else %}
+        <div class="job-salary masked">🔒 Salary undisclosed</div>
+        {% endif %}
+
+        <a href="{% url 'client:job_detail' job_id=job.id %}" class="btn btn-primary"
+            style="width:100%;justify-content:center;">
+            View Details →
+        </a>
+    </article>
+    {% endfor %}
+</div>
+
+<!-- PAGINATION -->
+{% if page_obj.has_other_pages %}
+<nav class="pagination">
+    {% if page_obj.has_previous %}
+    <a
+        href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}{% if selected_sector %}&sector={{ selected_sector }}{% endif %}">←
+        Prev</a>
+    {% else %}
+    <span class="disabled">← Prev</span>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+    {% if num == page_obj.number %}
+    <span class="current">{{ num }}</span>
+    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a
+        href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}{% if selected_sector %}&sector={{ selected_sector }}{% endif %}">
+        {{ num }}</a>
+        {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a
+            href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}{% if selected_sector %}&sector={{ selected_sector }}{% endif %}">Next
+            →</a>
+        {% else %}
+        <span class="disabled">Next →</span>
+        {% endif %}
+</nav>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <div class="icon">🔍</div>
+    <h3>No jobs match your search</h3>
+    <p>Try adjusting the filters or clearing the search.</p>
+    <a href="{% url 'client:jobs' %}" class="btn btn-secondary" style="margin-top:14px;">
+        Clear Filters
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}

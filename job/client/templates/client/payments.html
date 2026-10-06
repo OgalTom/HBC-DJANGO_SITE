@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Payments & Receipts · HBC Job Majuu{% endblock %}
+{% block content %}
+<div style="display:grid; gap:22px;">
+    <section class="card" style="padding:28px;">
+        <h1 style="margin-top:0;">Payments & receipts</h1>
+        <p>Track your platform access, application verification, and placement workflow with transparent payment
+            windows.</p>
+
+        <div style="margin-top:18px; padding:18px; background:#f8fafc; border-radius:12px; border:1px solid #e2e8f0;">
+            <strong>Total successfully paid:</strong> KES {{ total_spend|floatformat:2 }}
+        </div>
+
+        <div style="margin-top:18px; display:grid; gap:12px;">
+            <div class="card" style="padding:16px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
+                <strong>Tier 1 access:</strong>
+                {% if tier_1_active %}<span style="color:#166534;">Active</span>{% else %}<span
+                    style="color:#b45309;">Pending</span>{% endif %}
+            </div>
+            <div class="card" style="padding:16px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
+                <strong>Tier 2 access:</strong>
+                {% if tier_2_active %}<span style="color:#166534;">Active</span>{% else %}<span
+                    style="color:#b45309;">Pending</span>{% endif %}
+            </div>
+            <div class="card" style="padding:16px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
+                <strong>Tier 3 access:</strong>
+                {% if tier_3_active %}<span style="color:#166534;">Active</span>{% else %}<span
+                    style="color:#b45309;">Pending</span>{% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="card" style="padding:28px;">
+        <h2 style="margin-top:0;">Submit a payment</h2>
+        <form method="post" action="{% url 'client:payment_checkout' %}" style="display:grid; gap:16px;">
+            {% csrf_token %}
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+                <div>
+                    <label for="payment_tier">Access tier</label>
+                    <select id="payment_tier" name="payment_tier" class="form-input" required>
+                        <option value="TIER_1">Tier 1 - Membership</option>
+                        <option value="TIER_2">Tier 2 - Verification</option>
+                        <option value="TIER_3">Tier 3 - Placement</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="amount">Amount (KES)</label>
+                    <input id="amount" type="number" step="0.01" min="0" name="amount" class="form-input" value="2500"
+                        required>
+                </div>
+
+                <div>
+                    <label for="gateway">Payment method</label>
+                    <select id="gateway" name="gateway" class="form-input" required>
+                        <option value="M_PESA">M-Pesa</option>
+                        <option value="CARD">Card / Visa</option>
+                        <option value="PAYPAL">PayPal</option>
+                        <option value="BANK_TRANSFER">Bank transfer</option>
+                        <option value="MANUAL_OFFLINE">Manual offline receipt</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+                <div>
+                    <label for="provider_reference">Reference / transaction ID</label>
+                    <input id="provider_reference" type="text" name="provider_reference" class="form-input"
+                        placeholder="e.g. MPESA TXN123 or bank reference">
+                </div>
+
+                <div>
+                    <label for="payment_status">Status</label>
+                    <select id="payment_status" name="payment_status" class="form-input">
+                        <option value="PENDING">Pending verification</option>
+                        <option value="SUCCESS">Verified / received</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label for="notes">Payment notes</label>
+                <textarea id="notes" name="notes" rows="4" class="form-input"
+                    placeholder="Add receipt proof, bank confirmation, or payment notes for admin review."></textarea>
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-primary">Submit payment</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="card" style="padding:28px;">
+        <h2 style="margin-top:0;">Payment pathways</h2>
+        <div
+            style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-top:14px;">
+            <div class="card" style="padding:16px; border:1px solid #e2e8f0; border-radius:12px; background:#f8fafc;">
+                <strong>M-Pesa</strong>
+                <p style="margin:8px 0 0; color:#475569;">For quick mobile money verification.</p>
+            </div>
+            <div class="card" style="padding:16px; border:1px solid #e2e8f0; border-radius:12px; background:#f8fafc;">
+                <strong>Card / Visa</strong>
+                <p style="margin:8px 0 0; color:#475569;">For secure online card settlement.</p>
+            </div>
+            <div class="card" style="padding:16px; border:1px solid #e2e8f0; border-radius:12px; background:#f8fafc;">
+                <strong>PayPal</strong>
+                <p style="margin:8px 0 0; color:#475569;">For international and global clients.</p>
+            </div>
+            <div class="card" style="padding:16px; border:1px solid #e2e8f0; border-radius:12px; background:#f8fafc;">
+                <strong>Bank transfer</strong>
+                <p style="margin:8px 0 0; color:#475569;">For direct account transfers.</p>
+            </div>
+        </div>
+    </section>
+
+    {% if transactions %}
+    <section class="card" style="padding:28px;">
+        <h2 style="margin-top:0;">Recent payment history</h2>
+        <div style="margin-top:20px; display:grid; gap:12px;">
+            {% for tx in transactions %}
+            <div class="card" style="padding:16px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
+                <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    <div>
+                        <strong>{{ tx.get_payment_tier_display }}</strong><br>
+                        <span style="color:#64748b; font-size:.88rem;">{{ tx.created_at|date:"d M Y" }}</span>
+                    </div>
+                    <div>
+                        <strong>KES {{ tx.amount }}</strong><br>
+                        <span style="color:#64748b; font-size:.88rem;">{{ tx.get_payment_status_display }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% else %}
+    <section class="card" style="padding:24px; text-align:center; border:1px dashed #cbd5e1; background:#fff;">
+        No payment history yet.
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

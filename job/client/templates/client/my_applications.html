@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Applications · HBC Job Majuu{% endblock %}
+
+{% block extra_head %}
+<style>
+    .apps-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+
+    .apps-header h1 {
+        font-size: 1.7rem;
+        letter-spacing: -0.4px;
+        margin: 0;
+    }
+
+    .apps-table {
+        background: #ffffff;
+        border: 1px solid #e5eaf0;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .apps-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 14px;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid #eef2f7;
+        transition: background 0.15s ease;
+    }
+
+    .apps-row:last-child {
+        border-bottom: none;
+    }
+
+    .apps-row.header {
+        background: #f8fafc;
+        font-size: 0.74rem;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: #7a8797;
+    }
+
+    .apps-row:not(.header):hover {
+        background: #f8fbff;
+    }
+
+    @media (max-width: 720px) {
+        .apps-row {
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+
+        .apps-row.header {
+            display: none;
+        }
+    }
+
+    .apps-title {
+        font-weight: 800;
+        color: #172033;
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+    }
+
+    .apps-meta {
+        font-size: 0.8rem;
+        color: #7a8797;
+    }
+
+    .apps-cell {
+        font-size: 0.86rem;
+        color: #465468;
+    }
+
+    .pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .pill-submitted {
+        background: #eef2f7;
+        color: #475569;
+    }
+
+    .pill-vetting {
+        background: #eff6ff;
+        color: #1e40af;
+    }
+
+    .pill-agent_review {
+        background: #f5f3ff;
+        color: #5b21b6;
+    }
+
+    .pill-interview {
+        background: #fffbeb;
+        color: #92400e;
+    }
+
+    .pill-offer {
+        background: #ecfdf5;
+        color: #065f46;
+    }
+
+    .pill-visa {
+        background: #f0f9ff;
+        color: #0369a1;
+    }
+
+    .pill-deployed {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .pill-rejected {
+        background: #fef2f2;
+        color: #991b1b;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: #ffffff;
+        border: 1px solid #e5eaf0;
+        border-radius: 14px;
+    }
+
+    .empty-state .icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: #eef6fb;
+        color: #0f4c81;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        margin-bottom: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="apps-header">
+    <h1>My Applications</h1>
+    <a href="{% url 'client:jobs' %}" class="btn btn-primary">+ Browse Jobs</a>
+</div>
+
+{% if applications %}
+<div class="apps-table">
+    <div class="apps-row header">
+        <div>Job</div>
+        <div>Country</div>
+        <div>Stage</div>
+        <div>Updated</div>
+    </div>
+
+    {% for app in applications %}
+    <div class="apps-row">
+        <div>
+            <div class="apps-title"><a href="{% url 'client:application_detail' app.id %}"
+                    style="color:#0f4c81; font-weight:800;">{{ app.job.title }}</a></div>
+            <div class="apps-meta">{{ app.job.sector }} · {{ app.current_country|default:'Country pending' }}</div>
+        </div>
+        <div class="apps-cell">{{ app.job.country }}</div>
+        <div>
+            <span class="pill pill-{{ app.ats_stage|lower }}">
+                {{ app.get_ats_stage_display }}
+            </span>
+        </div>
+        <div class="apps-cell">
+            {{ app.updated_at|timesince }} ago<br>
+            <a href="{% url 'client:application_detail' app.id %}"
+                style="color:#0f4c81;font-size:0.78rem;font-weight:700;">View record</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="icon">📋</div>
+    <h3>No applications yet</h3>
+    <p>Browse verified international jobs and submit your first application.</p>
+    <a href="{% url 'client:jobs' %}" class="btn btn-primary" style="margin-top:14px;">
+        Browse Jobs
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ job.title }} · HBC Job Majuu{% endblock %}
+
+{% block extra_head %}
+<style>
+    .detail-wrap {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 22px;
+        align-items: start;
+    }
+
+    @media (max-width: 900px) {
+        .detail-wrap {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .detail-main,
+    .detail-side {
+        background: #ffffff;
+        border: 1px solid #e5eaf0;
+        border-radius: 14px;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .detail-main {
+        padding: 28px 30px;
+    }
+
+    .detail-side {
+        padding: 22px;
+        position: sticky;
+        top: 96px;
+    }
+
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eef2f7;
+    }
+
+    .detail-header h1 {
+        font-size: clamp(1.4rem, 2.4vw, 1.8rem);
+        letter-spacing: -0.5px;
+        margin-bottom: 8px;
+    }
+
+    .detail-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .detail-tag {
+        font-size: 0.74rem;
+        font-weight: 800;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #eef6fb;
+        color: #0f4c81;
+    }
+
+    .detail-tag.sector {
+        background: #ecfdf5;
+        color: #065f46;
+    }
+
+    .detail-flag {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #0f766e, #0f4c81);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .detail-section {
+        margin-bottom: 24px;
+    }
+
+    .detail-section h2 {
+        font-size: 1.05rem;
+        letter-spacing: -0.2px;
+        margin-bottom: 12px;
+    }
+
+    .detail-section p {
+        font-size: 0.94rem;
+        color: #465468;
+        white-space: pre-line;
+        margin-bottom: 12px;
+    }
+
+    /* Masked content */
+    .masked-box {
+        background: #fffbeb;
+        border: 1px dashed #fde68a;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .masked-box .lock {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #fef3c7;
+        color: #92400e;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+    .masked-box h3 {
+        font-size: 0.98rem;
+        color: #92400e;
+        margin-bottom: 6px;
+    }
+
+    .masked-box p {
+        color: #78350f;
+        font-size: 0.86rem;
+        margin-bottom: 14px;
+    }
+
+    /* Sidebar */
+    .side-label {
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: #7a8797;
+        margin-bottom: 6px;
+    }
+
+    .side-value {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #172033;
+        margin-bottom: 18px;
+    }
+
+    .side-value.money {
+        color: #065f46;
+    }
+
+    .side-value.locked {
+        color: #92400e;
+        background: #fffbeb;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 0.86rem;
+    }
+
+    .side-divider {
+        height: 1px;
+        background: #eef2f7;
+        margin: 18px 0;
+    }
+
+    .apply-btn {
+        display: block;
+        width: 100%;
+        padding: 13px 18px;
+        border-radius: 10px;
+        font-size: 0.96rem;
+        font-weight: 800;
+        text-align: center;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.2s ease,
+            background 0.2s ease;
+    }
+
+    .apply-btn.primary {
+        background: linear-gradient(180deg, #0f4c81, #0b3b65);
+        color: #fff;
+    }
+
+    .apply-btn.primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 24px rgba(15, 76, 129, 0.28);
+    }
+
+    .apply-btn.disabled {
+        background: #eef2f7;
+        color: #64748b;
+        cursor: not-allowed;
+    }
+
+    .apply-btn.applied {
+        background: #dcfce7;
+        color: #166534;
+        cursor: default;
+    }
+
+    .helper {
+        font-size: 0.8rem;
+        color: #7a8797;
+        text-align: center;
+        margin-top: 10px;
+        line-height: 1.5;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: #0f4c81;
+        margin-bottom: 18px;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<a href="{% url 'client:jobs' %}" class="back-link">← Back to Jobs</a>
+
+<div class="detail-wrap">
+
+    <!-- ================= MAIN ================= -->
+    <div class="detail-main">
+        <div class="detail-header">
+            <div>
+                <h1>{{ job.title }}</h1>
+                <div class="detail-tags">
+                    <span class="detail-tag">{{ job.country }}</span>
+                    <span class="detail-tag sector">{{ job.sector }}</span>
+                    <span class="detail-tag" style="background:#f1f5f9;color:#475569;">
+                        Posted {{ job.created_at|timesince }} ago
+                    </span>
+                </div>
+            </div>
+            <div class="detail-flag">{{ job.country|slice:":2"|upper }}</div>
+        </div>
+
+        <!-- Overview (always visible) -->
+        <div class="detail-section">
+            <h2>Overview</h2>
+            <p>{{ job.description_masked }}</p>
+        </div>
+
+        <!-- Full description (public or member-gated) -->
+        <div class="detail-section">
+            <h2>Full Job Description</h2>
+            {% if can_view_full_details %}
+            <p>{{ job.description_full }}</p>
+            {% else %}
+            <div class="masked-box">
+                <div class="lock">🔒</div>
+                {% if job.visibility == 'MEMBERS_ONLY' %}
+                <h3>Members-only opportunity</h3>
+                {% else %}
+                <h3>Job details are gated</h3>
+                {% endif %}
+                <p>Create an account and pay Tier 1 access to unlock this full job description and continue with the
+                    recruitment process.</p>
+                <a href="{% url 'client:payments' %}" class="btn btn-primary">
+                    Unlock with Tier 1
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="detail-side">
+
+        <div class="side-label">Salary</div>
+        {% if job.salary_disclosed and job.salary_range and is_member %}
+        <div class="side-value money">{{ job.salary_range }}</div>
+        {% elif job.salary_disclosed and job.salary_range %}
+        <div class="side-value locked">🔒 Revealed for members</div>
+        {% else %}
+        <div class="side-value locked">🔒 Undisclosed</div>
+        {% endif %}
+
+        <div class="side-divider"></div>
+
+        <div class="side-label">Tier 2 Fee</div>
+        <div class="side-value">KES {{ job.tier_2_fee|floatformat:0 }}</div>
+
+        <div class="side-label">Tier 3 Fee</div>
+        <div class="side-value">KES {{ job.tier_3_fee|floatformat:0 }}</div>
+
+        <div class="side-divider"></div>
+
+        {# ---------- APPLY LOGIC ---------- #}
+        {% if not user.is_authenticated %}
+        <a href="{% url 'client:login' %}?next={{ request.path }}" class="apply-btn primary">Sign in to Apply</a>
+        <p class="helper">You need an account to apply.</p>
+        {% elif has_applied %}
+        <div class="apply-btn applied">✓ Already Applied</div>
+        <p class="helper">
+            Status: <strong>{{ existing_application.get_ats_stage_display }}</strong><br>
+            <a href="{% url 'client:my_applications' %}" style="color:#0f4c81;font-weight:700;">View in My Applications
+                →</a>
+        </p>
+        {% elif not is_member %}
+        <a href="{% url 'client:payments' %}" class="apply-btn primary">Unlock Tier 1 to Apply</a>
+        <p class="helper">Tier 1 membership is required to apply.</p>
+        {% else %}
+        <form method="post" action="{% url 'client:apply_job' job.id %}">
+            {% csrf_token %}
+            <button type="submit" class="apply-btn primary">
+                Apply Now
+            </button>
+        </form>
+        <p class="helper">
+            Tier 2 fee of <strong>KES {{ job.tier_2_fee|floatformat:0 }}</strong>
+            will be charged for verification.
+        </p>
+        {% endif %}
+
+    </aside>
+</div>
+
+{% endblock %}

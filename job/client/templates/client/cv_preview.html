@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}CV Preview · HBC Job Majuu{% endblock %}
+{% block content %}
+<div class="card" style="padding:28px; max-width:920px; margin:0 auto;">
+    <div
+        style="display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; align-items:center; margin-bottom:20px;">
+        <div>
+            <h1 style="margin:0;">CV preview</h1>
+            <p style="margin:6px 0 0; color:#64748b;">Tier 1 access allows previewing your CV within the recruiting
+                platform.</p>
+        </div>
+        <a href="{% url 'client:dashboard' %}" class="btn btn-secondary">Back to dashboard</a>
+    </div>
+
+    <div class="card" style="padding:24px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px;">
+        <h2 style="margin-top:0;">{{ user_obj.get_full_name|default:user_obj.email }}</h2>
+        <div style="white-space:pre-wrap; line-height:1.7; color:#1f2937;">
+            {{ cv_text }}
+        </div>
+    </div>
+</div>
+{% endblock %}
