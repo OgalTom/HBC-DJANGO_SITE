@@ -196,7 +196,14 @@
 </div>
 {% else %}
 <div class="empty-state">
-    <div class="icon">📋</div>
+    <div class="icon"><svg class="icon-svg xl" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+            focusable="false">
+            <path d="M14 2.5H7.5A2.5 2.5 0 0 0 5 5v14a2.5 2.5 0 0 0 2.5 2.5h9A2.5 2.5 0 0 0 19 19V7.5L14 2.5Z" />
+            <path d="M14 2.5V7.5H19" />
+            <path d="M8.5 12h7" />
+            <path d="M8.5 16h7" />
+        </svg></div>
     <h3>No applications yet</h3>
     <p>Browse verified international jobs and submit your first application.</p>
     <a href="{% url 'client:jobs' %}" class="btn btn-primary" style="margin-top:14px;">

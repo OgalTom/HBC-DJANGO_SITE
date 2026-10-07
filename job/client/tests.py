@@ -1,7 +1,10 @@
+from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Application, Job, Transaction, User, UserAccessUnlock
+from .admin import user_has_section_access
+from .forms import PlatformStaffForm
+from .models import Application, Article, GalleryItem, Job, Partner, Transaction, User, UserAccessUnlock
 
 
 class AuthPageTests(TestCase):
@@ -79,6 +82,19 @@ class JobVisibilityTests(TestCase):
         self.assertContains(response, "Global recruitment platform")
         self.assertContains(response, "Tier 1")
 
+    def test_index_page_renders_partner_marquee(self):
+        Partner.objects.create(
+            name="Alaska Logistics",
+            short_description="Regional logistics partner",
+            logo_url="https://example.com/logo.png",
+            is_published=True,
+            sort_order=1,
+        )
+        response = self.client.get(reverse("client:index"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Trusted partners")
+        self.assertContains(response, "Alaska Logistics")
+
     def test_partner_review_page_for_assigned_application(self):
         application = self.public_job.applications.create(
             candidate=self.user,
@@ -99,6 +115,33 @@ class JobVisibilityTests(TestCase):
         response = self.client.get(reverse("client:job_detail", args=[self.public_job.id]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.public_job.title)
+
+    def test_member_only_job_is_visible_when_tier_unlock_is_active(self):
+        self.user.membership_tier = User.MembershipTier.FREE
+        self.user.save(update_fields=["membership_tier"])
+        UserAccessUnlock.objects.create(
+            user=self.user,
+            tier=UserAccessUnlock.Tier.TIER_1,
+            source=UserAccessUnlock.Source.MANUAL_ADMIN,
+            is_active=True,
+        )
+
+        self.assertTrue(self.user.has_active_tier(UserAccessUnlock.Tier.TIER_1))
+        self.assertTrue(self.member_job.is_visible_to(self.user))
+
+    def test_job_auto_populates_country_flag_and_cover_image(self):
+        job = Job.objects.create(
+            title="Operations Supervisor",
+            country="Kenya",
+            sector="Logistics",
+            description_masked="Operations summary",
+            description_full="Detailed operations role",
+            cover_image="https://example.com/kenya-job.jpg",
+        )
+
+        self.assertEqual(job.country_flag, "🇰🇪")
+        self.assertEqual(job.cover_image, "https://example.com/kenya-job.jpg")
+        self.assertEqual(job.image_url, "https://example.com/kenya-job.jpg")
 
 
 class UnlockAndProfileTests(TestCase):
@@ -174,6 +217,102 @@ class UnlockAndProfileTests(TestCase):
                 payment_status=Transaction.PaymentStatus.SUCCESS,
             ).exists()
         )
+
+    def test_section_access_checks_specific_admin_permissions(self):
+        self.user.is_staff = True
+        self.user.save()
+
+        self.assertFalse(user_has_section_access(self.user, "ATS / applicant tracking"))
+
+        self.user.user_permissions.add(Permission.objects.get(codename="view_application"))
+        self.assertTrue(user_has_section_access(self.user, "ATS / applicant tracking"))
+
+    def test_platform_roles_are_distinct_from_public_members(self):
+        platform_roles = [
+            User.Role.ADMIN,
+            User.Role.ADMIN_HANDLER,
+            User.Role.PARTNER,
+            User.Role.CONTENT_MANAGER,
+            User.Role.ATS_COORDINATOR,
+            User.Role.FINANCE_OFFICER,
+        ]
+
+        for role in platform_roles:
+            label = str(role).replace("ADMIN_", "").lower()
+            user = User.objects.create_user(
+                username=f"platform-{label}",
+                email=f"{label}@example.com",
+                password="StrongPass123!",
+                first_name="Platform",
+                last_name="Staff",
+                phone_number=f"+254700{label[:3]}001",
+                role=role,
+            )
+            self.assertTrue(user.is_platform_staff)
+            self.assertTrue(user.is_staff)
+
+    def test_platform_staff_form_omits_public_applicant_fields(self):
+        form = PlatformStaffForm()
+        self.assertNotIn("cv_summary", form.fields)
+        self.assertNotIn("passport_number", form.fields)
+        self.assertIn("role", form.fields)
+        self.assertIn("email", form.fields)
+
+
+class EditorialContentTests(TestCase):
+    def setUp(self):
+        self.story = Article.objects.create(
+            title="From Nairobi to Germany",
+            slug="from-nairobi-to-germany",
+            category=Article.Category.STORY,
+            excerpt="A candidate journey from Nairobi to Germany.",
+            body="An inspiring journey into overseas healthcare recruitment.",
+            image_url="https://example.com/story.jpg",
+            is_published=True,
+            author_name="HBC Team",
+        )
+        self.blog = Article.objects.create(
+            title="How to prepare for overseas recruitment",
+            slug="how-to-prepare-for-overseas-recruitment",
+            category=Article.Category.BLOG,
+            excerpt="Practical guidance for recruiters and applicants.",
+            body="Candidates should prepare documents and licensing early.",
+            image_url="https://example.com/blog.jpg",
+            is_published=True,
+            author_name="HBC Team",
+        )
+
+    def test_stories_page_lists_published_story_cards(self):
+        response = self.client.get(reverse("client:stories"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.story.title)
+        self.assertContains(response, self.story.excerpt)
+
+    def test_blog_page_lists_published_blog_cards(self):
+        response = self.client.get(reverse("client:blog"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.blog.title)
+        self.assertContains(response, self.blog.excerpt)
+
+    def test_story_detail_page_renders_article_content(self):
+        response = self.client.get(reverse("client:story_detail", args=[self.story.slug]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.story.title)
+        self.assertContains(response, self.story.body)
+
+    def test_gallery_page_renders_gallery_items(self):
+        item = GalleryItem.objects.create(
+            title="Recruitment Day in Nairobi",
+            slug="recruitment-day-in-nairobi",
+            description="A glimpse into our planning sessions and applicant onboarding.",
+            image_url="https://example.com/gallery.jpg",
+            is_published=True,
+        )
+
+        response = self.client.get(reverse("client:gallery"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, item.title)
+        self.assertContains(response, item.description)
 
 
 class ApplicantWorkflowTests(TestCase):

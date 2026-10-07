@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
+from django.utils.text import slugify
 
 
 # ============================================================
@@ -14,8 +15,14 @@ class User(AbstractUser):
 
     class Role(models.TextChoices):
         USER = "USER", "Candidate"
+        ADMIN = "ADMIN", "Super Admin"
+        ADMIN_SUPER = "ADMIN_SUPER", "Super Admin"
         ADMIN_HANDLER = "ADMIN_HANDLER", "Admin Handler"
         PARTNER = "PARTNER", "Partner Reviewer"
+        CONTENT_MANAGER = "CONTENT_MANAGER", "Content Manager"
+        DIGITAL_MARKETING = "DIGITAL_MARKETING", "Digital Marketing"
+        FINANCE_OFFICER = "FINANCE_OFFICER", "Finance Officer"
+        ATS_COORDINATOR = "ATS_COORDINATOR", "ATS Coordinator"
 
     class MembershipTier(models.TextChoices):
         FREE = "FREE", "Free"
@@ -89,14 +96,44 @@ class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        platform_roles = {
+            self.Role.ADMIN,
+            self.Role.ADMIN_SUPER,
+            self.Role.ADMIN_HANDLER,
+            self.Role.PARTNER,
+            self.Role.CONTENT_MANAGER,
+            self.Role.DIGITAL_MARKETING,
+            self.Role.FINANCE_OFFICER,
+            self.Role.ATS_COORDINATOR,
+        }
+        if self.role in platform_roles:
+            self.is_staff = True
+        elif self.role == self.Role.USER and not self.is_staff:
+            self.is_staff = False
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
     def active_accesses(self):
         return UserAccessUnlock.objects.filter(user=self, is_active=True).order_by("-granted_at")
 
+    @property
+    def is_platform_staff(self):
+        return self.role in {
+            self.Role.ADMIN,
+            self.Role.ADMIN_SUPER,
+            self.Role.ADMIN_HANDLER,
+            self.Role.PARTNER,
+            self.Role.CONTENT_MANAGER,
+            self.Role.DIGITAL_MARKETING,
+            self.Role.FINANCE_OFFICER,
+            self.Role.ATS_COORDINATOR,
+        }
+
     def has_active_tier(self, tier):
-        if self.role in {self.Role.ADMIN_HANDLER, self.Role.PARTNER}:
+        if self.is_platform_staff:
             return True
         if self.membership_tier == self.MembershipTier.PLACED:
             return True
@@ -110,6 +147,20 @@ class User(AbstractUser):
             "tier_2": self.has_active_tier(UserAccessUnlock.Tier.TIER_2),
             "tier_3": self.has_active_tier(UserAccessUnlock.Tier.TIER_3),
         }
+
+
+class PublicUser(User):
+    class Meta:
+        proxy = True
+        verbose_name = "Public user"
+        verbose_name_plural = "Public users"
+
+
+class PlatformUser(User):
+    class Meta:
+        proxy = True
+        verbose_name = "Platform user"
+        verbose_name_plural = "Platform users"
 
 
 class UserAccessUnlock(models.Model):
@@ -168,6 +219,48 @@ class Job(models.Model):
         PUBLIC = "PUBLIC", "Public"
         MEMBERS_ONLY = "MEMBERS_ONLY", "Members only"
 
+    COUNTRY_FLAG_MAP = {
+        "kenya": "🇰🇪",
+        "uganda": "🇺🇬",
+        "tanzania": "🇹🇿",
+        "rwanda": "🇷🇼",
+        "burundi": "🇧🇮",
+        "ethiopia": "🇪🇹",
+        "somalia": "🇸🇴",
+        "south africa": "🇿🇦",
+        "nigeria": "🇳🇬",
+        "ghana": "🇬🇭",
+        "cameroon": "🇨🇲",
+        "zambia": "🇿🇲",
+        "malawi": "🇲🇼",
+        "mozambique": "🇲🇿",
+        "egypt": "🇪🇬",
+        "saudi arabia": "🇸🇦",
+        "united arab emirates": "🇦🇪",
+        "uae": "🇦🇪",
+        "qatar": "🇶🇦",
+        "oman": "🇴🇲",
+        "bahrain": "🇧🇭",
+        "kuwait": "🇰🇼",
+        "jordan": "🇯🇴",
+        "lebanon": "🇱🇧",
+        "canada": "🇨🇦",
+        "united states": "🇺🇸",
+        "usa": "🇺🇸",
+        "united kingdom": "🇬🇧",
+        "uk": "🇬🇧",
+        "germany": "🇩🇪",
+        "france": "🇫🇷",
+        "italy": "🇮🇹",
+        "spain": "🇪🇸",
+        "netherlands": "🇳🇱",
+        "india": "🇮🇳",
+        "pakistan": "🇵🇰",
+        "sudan": "🇸🇩",
+        "yemen": "🇾🇪",
+        "oman": "🇴🇲",
+    }
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -177,6 +270,7 @@ class Job(models.Model):
     title = models.CharField(max_length=150)
 
     country = models.CharField(max_length=50)
+    country_flag = models.CharField(max_length=20, blank=True, default="", help_text="Auto-generated flag for the country, such as 🇰🇪")
 
     sector = models.CharField(max_length=50)
 
@@ -218,19 +312,52 @@ class Job(models.Model):
     )
 
     image_url = models.URLField(max_length=500, blank=True, default="")
+    cover_image = models.URLField(max_length=500, blank=True, default="", help_text="Optional cover image for the job card and detail page.")
     image_alt = models.CharField(max_length=150, blank=True, default="")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @staticmethod
+    def get_country_flag(country_name):
+        if not country_name:
+            return "🌍"
+        country_key = country_name.strip().lower()
+        return Job.COUNTRY_FLAG_MAP.get(country_key, "🌍") or "🌍"
+
+    def save(self, *args, **kwargs):
+        if self.country and not self.country_flag:
+            self.country_flag = self.get_country_flag(self.country)
+        elif self.country and self.country_flag == "🌍":
+            self.country_flag = self.get_country_flag(self.country)
+        if self.cover_image and not self.image_url:
+            self.image_url = self.cover_image
+        elif self.cover_image and self.image_url != self.cover_image:
+            self.image_url = self.cover_image
+        if not self.cover_image and self.image_url:
+            self.cover_image = self.image_url
+        super().save(*args, **kwargs)
 
     def is_visible_to(self, user):
         if self.visibility == self.Visibility.PUBLIC:
             return True
         if not user or not getattr(user, "is_authenticated", False):
             return False
-        if getattr(user, "role", None) in {User.Role.ADMIN_HANDLER, User.Role.PARTNER}:
+        if getattr(user, "role", None) in {
+            User.Role.ADMIN,
+            User.Role.ADMIN_SUPER,
+            User.Role.ADMIN_HANDLER,
+            User.Role.PARTNER,
+            User.Role.CONTENT_MANAGER,
+            User.Role.DIGITAL_MARKETING,
+            User.Role.FINANCE_OFFICER,
+            User.Role.ATS_COORDINATOR,
+        }:
             return True
-        return user.membership_tier in {User.MembershipTier.MEMBER, User.MembershipTier.PLACED}
+        return (
+            user.has_active_tier(UserAccessUnlock.Tier.TIER_1)
+            or user.membership_tier in {User.MembershipTier.MEMBER, User.MembershipTier.PLACED}
+        )
 
     def __str__(self):
         return f"{self.title} - {self.country}"
@@ -239,6 +366,146 @@ class Job(models.Model):
 # ============================================================
 # APPLICATION / ATS
 # ============================================================
+
+
+class Article(models.Model):
+
+    class Category(models.TextChoices):
+        STORY = "STORY", "Story"
+        BLOG = "BLOG", "Blog"
+
+    class Status(models.TextChoices):
+        DRAFT = "DRAFT", "Draft"
+        PUBLISHED = "PUBLISHED", "Published"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=220)
+    slug = models.SlugField(max_length=240, unique=True, blank=True)
+    category = models.CharField(max_length=20, choices=Category.choices, default=Category.BLOG)
+    excerpt = models.TextField(blank=True, default="")
+    body = models.TextField()
+    featured_image = models.URLField(max_length=500, blank=True, default="")
+    image_url = models.URLField(max_length=500, blank=True, default="")
+    image_alt = models.CharField(max_length=160, blank=True, default="")
+    author_name = models.CharField(max_length=120, default="HBC Job Majuu")
+    read_time = models.CharField(max_length=50, default="4 min read")
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
+    is_published = models.BooleanField(default=False)
+    published_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("-published_at", "-created_at")
+
+    def save(self, *args, **kwargs):
+        if self.featured_image and not self.image_url:
+            self.image_url = self.featured_image
+        elif self.image_url and not self.featured_image:
+            self.featured_image = self.image_url
+
+        if self.is_published:
+            self.status = self.Status.PUBLISHED
+            self.is_published = True
+        elif self.status == self.Status.PUBLISHED:
+            self.is_published = True
+            self.status = self.Status.PUBLISHED
+        else:
+            self.is_published = False
+            self.status = self.Status.DRAFT
+
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            while Article.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+
+        if self.is_published and not self.published_at:
+            from django.utils import timezone
+            self.published_at = timezone.now()
+
+        super().save(*args, **kwargs)
+
+    @property
+    def preview_image(self):
+        return self.featured_image or self.image_url or ""
+
+    def __str__(self):
+        return self.title
+
+
+class Story(Article):
+    class Meta:
+        proxy = True
+        verbose_name = "Story"
+        verbose_name_plural = "Stories"
+
+
+class BlogPost(Article):
+    class Meta:
+        proxy = True
+        verbose_name = "Blog post"
+        verbose_name_plural = "Blog posts"
+
+
+class GalleryItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=180)
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+    description = models.TextField(blank=True, default="")
+    image_url = models.URLField(max_length=500, blank=True, default="")
+    is_published = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Gallery item"
+        verbose_name_plural = "Gallery"
+        ordering = ("-created_at",)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            while GalleryItem.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+
+
+class Partner(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=180)
+    short_description = models.CharField(max_length=220, blank=True, default="")
+    logo_url = models.URLField(max_length=500, blank=True, default="")
+    logo_image = models.FileField(upload_to="partners/", blank=True, null=True)
+    website = models.URLField(max_length=500, blank=True, default="")
+    is_published = models.BooleanField(default=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("sort_order", "name")
+        verbose_name = "Partner"
+        verbose_name_plural = "Partners"
+
+    @property
+    def display_logo(self):
+        if self.logo_image:
+            return self.logo_image.url
+        return self.logo_url or ""
+
+    def __str__(self):
+        return self.name
 
 
 class Application(models.Model):

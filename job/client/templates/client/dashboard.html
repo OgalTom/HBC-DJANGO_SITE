@@ -9,7 +9,7 @@
        DASHBOARD
     ============================================================ */
     .dash-hero {
-        background: linear-gradient(135deg, #0f4c81 0%, #102a43 100%);
+        background: #0f4c81;
         color: #ffffff;
         border-radius: 18px;
         padding: 34px 34px 32px;
@@ -151,8 +151,8 @@
     }
 
     .stat-card.accent {
-        background: linear-gradient(180deg, #f0f9ff, #ffffff);
-        border-color: #bfdbfe;
+        background: #f3f8fc;
+        border-color: #dfeaf3;
     }
 
     .stat-card.accent .stat-value {
@@ -228,7 +228,7 @@
         width: 42px;
         height: 42px;
         border-radius: 10px;
-        background: linear-gradient(135deg, #0f766e, #0f4c81);
+        background: var(--brand);
         color: #ffffff;
         display: inline-flex;
         align-items: center;
@@ -350,7 +350,7 @@
 
     .progress-bar {
         height: 100%;
-        background: linear-gradient(90deg, #0f766e, #0f4c81);
+        background: var(--brand);
         border-radius: 999px;
         transition: width 0.5s ease;
     }
@@ -501,10 +501,22 @@
         </div>
         <div class="dash-hero-actions">
             <a href="{% url 'client:jobs' %}" class="btn-hero primary">
-                🔍 Browse Jobs
+                <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true" focusable="false">
+                    <circle cx="11" cy="11" r="6" />
+                    <path d="M16 16l4 4" />
+                </svg> Browse Jobs
             </a>
             <a href="{% url 'client:visa_readiness' %}" class="btn-hero ghost">
-                ✈️ Visa Readiness
+                <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true" focusable="false">
+                    <path d="M3 13.5 14 4l6 6-11 9.5" />
+                    <path d="M12 9 5.5 15.5" />
+                    <path d="M16 9h2.5v2.5" />
+                    <path d="M14 20h7" />
+                </svg> Visa Readiness
             </a>
         </div>
     </div>
@@ -546,7 +558,13 @@
         <section class="dash-section">
             <div class="dash-section-header">
                 <h2>Recent Applications</h2>
-                <a href="{% url 'client:my_applications' %}">View all →</a>
+                <a href="{% url 'client:my_applications' %}">View all <svg class="icon-svg sm"
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        focusable="false">
+                        <path d="M5 12h14" />
+                        <path d="m13 5 7 7-7 7" />
+                    </svg></a>
             </div>
             <div class="dash-section-body">
 
@@ -570,7 +588,15 @@
                 {% endfor %}
                 {% else %}
                 <div class="empty">
-                    <div class="empty-icon">📄</div>
+                    <div class="empty-icon"><svg class="icon-svg lg" xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <path
+                                d="M14 2.5H7.5A2.5 2.5 0 0 0 5 5v14a2.5 2.5 0 0 0 2.5 2.5h9A2.5 2.5 0 0 0 19 19V7.5L14 2.5Z" />
+                            <path d="M14 2.5V7.5H19" />
+                            <path d="M8.5 12h7" />
+                            <path d="M8.5 16h7" />
+                        </svg></div>
                     <h3>No applications yet</h3>
                     <p>Start by browsing verified international jobs and applying.</p>
                     <a href="{% url 'client:jobs' %}" class="btn btn-primary">Browse Jobs</a>
@@ -584,7 +610,12 @@
         <section class="dash-section">
             <div class="dash-section-header">
                 <h2>Recommended for You</h2>
-                <a href="{% url 'client:jobs' %}">See more →</a>
+                <a href="{% url 'client:jobs' %}">See more <svg class="icon-svg sm" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <path d="M5 12h14" />
+                        <path d="m13 5 7 7-7 7" />
+                    </svg></a>
             </div>
             <div class="dash-section-body">
                 {% if recommended_jobs %}
@@ -602,7 +633,14 @@
                 {% endfor %}
                 {% else %}
                 <div class="empty">
-                    <div class="empty-icon">🌍</div>
+                    <div class="empty-icon"><svg class="icon-svg lg" xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <circle cx="12" cy="12" r="8" />
+                            <path d="M3 12h18" />
+                            <path d="M12 4a13.5 13.5 0 0 1 0 16" />
+                            <path d="M12 4a13.5 13.5 0 0 0 0 16" />
+                        </svg></div>
                     <h3>No new jobs right now</h3>
                     <p>Check back soon — new international roles are added weekly.</p>
                 </div>
@@ -614,7 +652,13 @@
         <section class="dash-section">
             <div class="dash-section-header">
                 <h2>Your Placement Tiers</h2>
-                <a href="{% url 'client:payments' %}">Payments →</a>
+                <a href="{% url 'client:payments' %}">Payments <svg class="icon-svg sm"
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        focusable="false">
+                        <path d="M5 12h14" />
+                        <path d="m13 5 7 7-7 7" />
+                    </svg></a>
             </div>
             <div class="dash-section-body">
 
@@ -666,7 +710,12 @@
         <section class="dash-section">
             <div class="dash-section-header">
                 <h2>Profile Completion</h2>
-                <a href="{% url 'client:profile' %}">Edit →</a>
+                <a href="{% url 'client:profile' %}">Edit <svg class="icon-svg sm" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <path d="M5 12h14" />
+                        <path d="m13 5 7 7-7 7" />
+                    </svg></a>
             </div>
             <div class="dash-section-body">
                 <div style="font-size:0.86rem;color:#64748b;">
@@ -690,16 +739,40 @@
             <div class="dash-section-body">
                 <div class="quick-links">
                     <a href="{% url 'client:document_vault' %}" class="quick-link">
-                        <span class="ql-icon">🔒</span> Document Vault
+                        <span class="ql-icon"><svg class="icon-svg" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                <rect x="5" y="11" width="14" height="9" rx="2" />
+                                <path d="M8 11V8.5A4 4 0 0 1 12 4.5a4 4 0 0 1 4 4V11" />
+                            </svg></span> Document Vault
                     </a>
                     <a href="{% url 'client:visa_readiness' %}" class="quick-link">
-                        <span class="ql-icon">✅</span> Visa Readiness Check
+                        <span class="ql-icon"><svg class="icon-svg" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
+                                <path d="m9 12 2 2 4-5" />
+                            </svg></span> Visa Readiness Check
                     </a>
                     <a href="{% url 'client:payments' %}" class="quick-link">
-                        <span class="ql-icon">💳</span> Payments &amp; Receipts
+                        <span class="ql-icon"><svg class="icon-svg" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                <rect x="2.5" y="6" width="19" height="12" rx="2" />
+                                <path d="M2.5 10.5h19" />
+                                <path d="M7 15.5h3" />
+                            </svg></span> Payments &amp; Receipts
                     </a>
                     <a href="{% url 'client:my_applications' %}" class="quick-link">
-                        <span class="ql-icon">📋</span> All Applications
+                        <span class="ql-icon"><svg class="icon-svg" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                <path
+                                    d="M14 2.5H7.5A2.5 2.5 0 0 0 5 5v14a2.5 2.5 0 0 0 2.5 2.5h9A2.5 2.5 0 0 0 19 19V7.5L14 2.5Z" />
+                                <path d="M14 2.5V7.5H19" />
+                                <path d="M8.5 12h7" />
+                                <path d="M8.5 16h7" />
+                            </svg></span> All Applications
                     </a>
                 </div>
             </div>

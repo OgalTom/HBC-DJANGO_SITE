@@ -5,217 +5,1019 @@
 
 {% block extra_head %}
 <style>
+    /* =====================================================
+       HERO
+    ===================================================== */
     .hero {
-        background: linear-gradient(135deg, #0f4c81 0%, #102a43 100%);
-        border-radius: 24px;
-        padding: clamp(28px, 5vw, 56px);
-        color: #fff;
-        box-shadow: 0 18px 40px rgba(15, 76, 129, 0.18);
+        position: relative;
+        padding: 72px 0 88px;
+        overflow: hidden;
     }
 
-    .hero-content {
+    .hero-inner {
         display: grid;
-        grid-template-columns: 1.3fr .7fr;
-        gap: 22px;
+        grid-template-columns: 1.05fr .95fr;
+        gap: 64px;
         align-items: center;
     }
 
-    .eyebrow {
-        display: inline-block;
-        font-size: .78rem;
-        letter-spacing: .14em;
+    .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        font-weight: 800;
-        color: rgba(255, 255, 255, .72);
-        margin-bottom: 18px;
+        color: var(--brand);
+        background: var(--brand-soft);
+        padding: 6px 12px;
+        border-radius: 999px;
+        margin-bottom: 22px;
+    }
+
+    .hero-eyebrow::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
     }
 
     .hero h1 {
-        color: #fff;
-        margin-bottom: 14px;
+        font-size: clamp(2.3rem, 4.4vw, 3.6rem);
+        margin-bottom: 20px;
+        letter-spacing: -0.03em;
     }
 
-    .hero p {
-        color: rgba(255, 255, 255, .8);
-        font-size: 1.06rem;
-        margin-bottom: 22px;
+    .hero h1 em {
+        font-style: italic;
+        color: var(--brand);
+    }
+
+    .hero-lede {
+        font-size: 1.1rem;
+        color: var(--ink-soft);
+        margin-bottom: 30px;
+        max-width: 540px;
+        line-height: 1.6;
     }
 
     .hero-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
+        margin-bottom: 34px;
     }
 
-    .hero-panel {
-        background: rgba(255, 255, 255, .08);
-        border: 1px solid rgba(255, 255, 255, .15);
-        border-radius: 18px;
-        padding: 20px;
-    }
-
-    .metric-list {
-        display: grid;
-        gap: 16px;
-        margin-top: 18px;
-    }
-
-    .metric {
-        padding: 14px 16px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, .06);
-        border: 1px solid rgba(255, 255, 255, .12);
-    }
-
-    .metric strong {
-        display: block;
-        font-size: 1.7rem;
-        color: #fff;
-    }
-
-    .feature-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    .hero-trust {
+        display: flex;
+        align-items: center;
         gap: 18px;
-        margin-top: 28px;
+        padding-top: 24px;
+        border-top: 1px solid var(--line);
     }
 
-    .feature-card {
+    .hero-trust .avatars {
+        display: flex;
+    }
+
+    .hero-trust .avatars span {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        margin-left: -10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #fff;
+        background: var(--brand);
+    }
+
+    .hero-trust .avatars span:first-child {
+        margin-left: 0;
+    }
+
+    .hero-trust .avatars span:nth-child(2) {
+        background: #0f766e;
+    }
+
+    .hero-trust .avatars span:nth-child(3) {
+        background: #92400e;
+    }
+
+    .hero-trust .avatars span:nth-child(4) {
+        background: #5b21b6;
+    }
+
+    .hero-trust p {
+        font-size: 0.88rem;
+        color: var(--muted);
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .hero-trust strong {
+        color: var(--ink);
+        font-weight: 700;
+    }
+
+    /* HERO VISUAL */
+    .hero-visual {
+        position: relative;
+        aspect-ratio: 4 / 5;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 30px 60px -30px rgba(13, 27, 42, .35);
+    }
+
+    .hero-visual img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hero-card {
+        position: absolute;
         background: #fff;
-        border: 1px solid #e5eaf0;
-        border-radius: 16px;
-        padding: 22px;
-        box-shadow: 0 8px 24px rgba(15, 23, 42, .04);
+        border-radius: 12px;
+        padding: 14px 16px;
+        box-shadow: 0 12px 32px -12px rgba(13, 27, 42, .25);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.86rem;
     }
 
-    .feature-card h3 {
+    .hero-card .icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .hero-card strong {
+        display: block;
+        color: var(--ink);
+        font-weight: 700;
+        font-size: 0.88rem;
+    }
+
+    .hero-card span {
+        color: var(--muted);
+        font-size: 0.78rem;
+    }
+
+    .hero-card-1 {
+        top: 22px;
+        left: -22px;
+    }
+
+    .hero-card-1 .icon {
+        background: #ecfdf5;
+        color: #065f46;
+    }
+
+    .hero-card-2 {
+        bottom: 26px;
+        right: -22px;
+    }
+
+    .hero-card-2 .icon {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    /* =====================================================
+       LOGO STRIP
+    ===================================================== */
+    .logo-strip {
+        padding: 26px 0 40px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 64px;
+    }
+
+    .logo-strip p {
+        text-align: center;
+        font-size: 0.78rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 18px;
+        font-weight: 600;
+    }
+
+    .logo-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 46px;
+        flex-wrap: wrap;
+        opacity: .7;
+    }
+
+    .logo-row span {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--ink-soft);
+        letter-spacing: -0.02em;
+    }
+
+    /* =====================================================
+       SECTIONS
+    ===================================================== */
+    .section {
+        padding: 40px 0;
+    }
+
+    .section-head {
+        max-width: 640px;
+        margin-bottom: 40px;
+    }
+
+    .section-head .kicker {
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .section-head h2 {
+        font-size: clamp(1.7rem, 3vw, 2.3rem);
+        margin-bottom: 14px;
+    }
+
+    .section-head p {
+        color: var(--ink-soft);
+        font-size: 1.02rem;
+        margin: 0;
+    }
+
+    /* HOW IT WORKS */
+    .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0;
+        border-top: 1px solid var(--line);
+    }
+
+    .step {
+        padding: 34px 30px 34px 0;
+        border-right: 1px solid var(--line);
+        position: relative;
+    }
+
+    .step:last-child {
+        border-right: none;
+        padding-right: 0;
+    }
+
+    .step:not(:first-child) {
+        padding-left: 30px;
+    }
+
+    .step-num {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--accent);
+        letter-spacing: 0.05em;
+        margin-bottom: 14px;
+        display: block;
+    }
+
+    .step h3 {
+        font-size: 1.25rem;
         margin-bottom: 10px;
     }
 
-    .tiers {
+    .step p {
+        color: var(--ink-soft);
+        font-size: 0.94rem;
+        margin: 0;
+    }
+
+    /* FEATURE SPLIT */
+    .feature-split {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 18px;
-        margin-top: 28px;
+        grid-template-columns: 1fr 1fr;
+        gap: 56px;
+        align-items: center;
     }
 
-    .tier-box {
-        background: #fff;
-        border: 1px solid #e5eaf0;
+    .feature-image {
         border-radius: 16px;
-        padding: 22px;
+        overflow: hidden;
+        aspect-ratio: 5 / 4;
+        box-shadow: 0 24px 50px -30px rgba(13, 27, 42, .3);
     }
 
-    .tier-box h3 {
+    .feature-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .feature-list {
+        display: grid;
+        gap: 26px;
+    }
+
+    .feature-item {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .feature-item .mark {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--brand-soft);
+        color: var(--brand);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1rem;
+    }
+
+    .feature-item .mark svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .feature-item h4 {
+        font-family: "Inter", sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+        letter-spacing: -0.01em;
+    }
+
+    .feature-item p {
+        margin: 0;
+        font-size: 0.92rem;
+        color: var(--ink-soft);
+    }
+
+    /* STATS BAND */
+    .stats-band {
+        background: var(--ink);
+        color: #fff;
+        border-radius: 18px;
+        padding: 48px clamp(24px, 5vw, 64px);
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+        margin: 20px 0;
+    }
+
+    .stat strong {
+        display: block;
+        font-family: "Fraunces", Georgia, serif;
+        font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+        color: #fff;
+        line-height: 1;
         margin-bottom: 8px;
+        letter-spacing: -0.02em;
     }
 
-    .tier-box .tag {
-        display: inline-block;
-        font-size: .7rem;
-        letter-spacing: .12em;
-        text-transform: uppercase;
-        background: #eef6fb;
-        color: #0f4c81;
-        padding: 6px 10px;
+    .stat span {
+        font-size: 0.86rem;
+        color: rgba(255, 255, 255, .65);
+        line-height: 1.4;
+    }
+
+    /* =====================================================
+       TESTIMONIALS GRID
+    ===================================================== */
+    .partners-marquee-wrap {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 18px;
+        padding: 18px 0;
+        margin-bottom: 18px;
+        box-shadow: 0 14px 30px -24px rgba(13, 27, 42, .24);
+    }
+
+    .partners-marquee {
+        display: flex;
+        width: max-content;
+        gap: 28px;
+        align-items: center;
+        animation: partners-scroll 34s linear infinite;
+    }
+
+    .partners-marquee:hover {
+        animation-play-state: paused;
+    }
+
+    .partner-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        white-space: nowrap;
+        background: #f8fafc;
+        border: 1px solid var(--line);
+        padding: 12px 18px;
         border-radius: 999px;
-        font-weight: 800;
+        min-width: 180px;
+        justify-content: center;
+    }
+
+    .partner-pill img {
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .partner-pill span {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--ink);
+    }
+
+    @keyframes partners-scroll {
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(-50%);
+        }
+    }
+
+    .testimonial-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 26px;
+    }
+
+    .testimonial {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 28px 24px;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        transition: box-shadow .2s ease, transform .2s ease;
+    }
+
+    .testimonial:hover {
+        box-shadow: 0 18px 40px -24px rgba(13, 27, 42, .28);
+        transform: translateY(-2px);
+    }
+
+    .testimonial blockquote {
+        margin: 0;
+        font-size: 0.98rem;
+        line-height: 1.6;
+        color: var(--ink-soft);
+        font-family: "Inter", sans-serif;
+        position: relative;
+        padding-top: 8px;
+    }
+
+    .testimonial blockquote::before {
+        content: "\201C";
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 2.4rem;
+        color: var(--accent);
+        line-height: 0;
+        vertical-align: -0.35em;
+        margin-right: 4px;
+    }
+
+    .testimonial figcaption {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: auto;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+    }
+
+    .avatar-sm {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--brand), var(--brand-deep));
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.82rem;
+        flex-shrink: 0;
+    }
+
+    .testimonial figcaption strong {
+        display: block;
+        font-size: 0.9rem;
+        color: var(--ink);
+    }
+
+    .testimonial figcaption span {
+        font-size: 0.8rem;
+        color: var(--muted);
+    }
+
+    /* =====================================================
+       QUOTE BLOCK (single large testimonial)
+    ===================================================== */
+    .quote-block {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 56px;
+        align-items: center;
+    }
+
+    .quote-image {
+        border-radius: 16px;
+        overflow: hidden;
+        aspect-ratio: 1 / 1;
+        box-shadow: 0 24px 50px -30px rgba(13, 27, 42, .3);
+    }
+
+    .quote-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .quote-text blockquote {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+        line-height: 1.4;
+        color: var(--ink);
+        margin-bottom: 26px;
+        letter-spacing: -0.02em;
+        font-weight: 600;
+    }
+
+    .quote-text blockquote::before {
+        content: "\201C";
+        font-size: 3rem;
+        color: var(--accent);
+        line-height: 0;
+        vertical-align: -0.4em;
+        margin-right: 6px;
+    }
+
+    .quote-author {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .quote-author .avatar-lg {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--brand), var(--brand-deep));
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .quote-author strong {
+        display: block;
+        font-size: 0.95rem;
+        color: var(--ink);
+    }
+
+    .quote-author span {
+        font-size: 0.85rem;
+        color: var(--muted);
+    }
+
+    /* =====================================================
+       CTA BAND
+    ===================================================== */
+    .cta-band {
+        background: var(--brand);
+        border-radius: 18px;
+        padding: 56px clamp(24px, 5vw, 64px);
+        color: #fff;
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 40px;
+        align-items: center;
+        margin: 40px 0 20px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .cta-band::after {
+        content: "";
+        position: absolute;
+        right: -80px;
+        top: -80px;
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .06);
+    }
+
+    .cta-band h2 {
+        color: #fff;
+        font-size: clamp(1.6rem, 3vw, 2.2rem);
         margin-bottom: 12px;
     }
 
-    @media (max-width: 800px) {
-        .hero-content {
+    .cta-band p {
+        color: rgba(255, 255, 255, .8);
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .cta-band .cta-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cta-band .btn-secondary {
+        background: rgba(255, 255, 255, .1);
+        color: #fff;
+        border-color: rgba(255, 255, 255, .25);
+    }
+
+    .cta-band .btn-secondary:hover {
+        background: rgba(255, 255, 255, .18);
+    }
+
+    .cta-band .btn-primary {
+        background: #fff;
+        color: var(--brand-deep);
+    }
+
+    .cta-band .btn-primary:hover {
+        background: #f1f5f9;
+    }
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+    @media (max-width: 900px) {
+        .hero-inner {
             grid-template-columns: 1fr;
+            gap: 40px;
+        }
+
+        .hero-visual {
+            aspect-ratio: 16 / 10;
+            max-width: 560px;
+        }
+
+        .hero-card-1 {
+            left: 16px;
+        }
+
+        .hero-card-2 {
+            right: 16px;
+        }
+
+        .steps {
+            grid-template-columns: 1fr;
+        }
+
+        .step {
+            border-right: none;
+            border-bottom: 1px solid var(--line);
+            padding: 26px 0;
+        }
+
+        .step:not(:first-child) {
+            padding-left: 0;
+        }
+
+        .feature-split,
+        .quote-block {
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+
+        .stats-band {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 26px;
+        }
+
+        .testimonial-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .cta-band {
+            grid-template-columns: 1fr;
+        }
+
+        .cta-band .cta-actions {
+            justify-content: flex-start;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero {
+            padding: 40px 0 56px;
+        }
+
+        .stats-band {
+            padding: 32px 24px;
+        }
+
+        .hero-trust {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
+
+<!-- ============ HERO ============ -->
 <section class="hero">
-    <div class="hero-content">
+    <div class="hero-inner">
         <div>
-            <span class="eyebrow">Global recruitment platform</span>
-            <h1>Hire across industries and place talent across borders.</h1>
-            <p>HBC Job Majuu connects employers, recruiters, visa specialists, and job seekers across every major sector
-                — from healthcare and hospitality to logistics, construction, agriculture, engineering, and skilled
-                trade roles.</p>
+            <span class="hero-eyebrow">Global recruitment platform</span>
+            <h1>Hire across industries. Place talent <em>across borders.</em></h1>
+            <p class="hero-lede">
+                HBC Job Majuu connects employers, recruiters, visa specialists, and job seekers across every major
+                sector — from healthcare and hospitality to logistics, construction, agriculture, engineering, and
+                skilled trade roles. Tier 1 access unlocks detailed job visibility and the full application journey.
+            </p>
             <div class="hero-actions">
-                <a href="{% url 'client:jobs' %}" class="btn btn-primary">Explore jobs</a>
-                <a href="{% url 'client:register' %}" class="btn btn-secondary"
-                    style="background:#fff;color:#0f4c81;">Create account</a>
+                <a href="{% url 'client:jobs' %}" class="btn btn-primary">Browse open roles</a>
+                <a href="{% url 'client:register' %}" class="btn btn-secondary">Create account</a>
+            </div>
+            <div class="hero-trust">
+                <div class="avatars">
+                    <span>A</span><span>K</span><span>M</span><span>+</span>
+                </div>
+                <p><strong>4,200+ candidates</strong> placed across 18 countries since 2019.</p>
             </div>
         </div>
-        <div class="hero-panel">
-            <div class="metric-list">
-                <div class="metric">
-                    <span
-                        style="color:rgba(255,255,255,.7); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;">Tier
-                        1</span>
-                    <strong>Access</strong>
-                    <span style="color:rgba(255,255,255,.72);">Create an account and pay to unlock full job details and
-                        platform access.</span>
+
+        <div class="hero-visual">
+            <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80"
+                alt="Recruitment team working together">
+            <div class="hero-card hero-card-1">
+                <span class="icon"><svg class="icon-svg md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
+                        <path d="m9 12 2 2 4-5" />
+                    </svg></span>
+                <div>
+                    <strong>Verified employer</strong>
+                    <span>Tier 2 clearance</span>
                 </div>
-                <div class="metric">
-                    <span
-                        style="color:rgba(255,255,255,.7); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;">Tier
-                        2</span>
-                    <strong>Verification</strong>
-                    <span style="color:rgba(255,255,255,.72);">Document review, CV validation, passport checks, and
-                        application processing.</span>
-                </div>
-                <div class="metric">
-                    <span
-                        style="color:rgba(255,255,255,.7); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;">Tier
-                        3</span>
-                    <strong>Placement</strong>
-                    <span style="color:rgba(255,255,255,.72);">Visa processing, travel arrangements, onboarding, and
-                        deployment support.</span>
+            </div>
+            <div class="hero-card hero-card-2">
+                <span class="icon"><svg class="icon-svg md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <path d="M3 13.5 14 4l6 6-11 9.5" />
+                        <path d="M12 9 5.5 15.5" />
+                        <path d="M16 9h2.5v2.5" />
+                        <path d="M14 20h7" />
+                    </svg></span>
+                <div>
+                    <strong>Visa processing</strong>
+                    <span>Avg. 6–8 weeks</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="feature-grid">
-    <article class="feature-card">
-        <h3>Public listings, paid access</h3>
-        <p>Jobs are publicly listed for visibility, but full details remain behind the Tier 1 platform access to filter
-            out unserious applicants and protect the quality of the recruitment process.</p>
-    </article>
-    <article class="feature-card">
-        <h3>Verification-first hiring</h3>
-        <p>Once a candidate is interested, the second stage focuses on document verification, passport and CV review,
-            and careful application screening under admin and partner oversight.</p>
-    </article>
-    <article class="feature-card">
-        <h3>Placement and visa support</h3>
-        <p>Successful applicants move into the final stage where the team manages visa facilitation, travel
-            arrangements, onboarding logistics, and deployment coordination.</p>
-    </article>
+<!-- ============ LOGO STRIP ============ -->
+<section class="logo-strip">
+    <p>Trusted by employers and partners across</p>
+    <div class="logo-row">
+        <span>Healthcare</span>
+        <span>Hospitality</span>
+        <span>Logistics</span>
+        <span>Construction</span>
+        <span>Agriculture</span>
+        <span>Engineering</span>
+    </div>
 </section>
 
-<section style="margin-top:32px;">
-    <h2 style="margin-bottom:12px;">Three-stage model</h2>
-    <div class="tiers">
-        <div class="tier-box">
-            <span class="tag">Tier 1</span>
-            <h3>Platform access</h3>
-            <p>Create an account, pay to access the platform, and view complete job descriptions before making a real
-                application.</p>
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section">
+    <div class="section-head">
+        <span class="kicker">How it works</span>
+        <h2>A three-stage process, built for serious placements.</h2>
+        <p>We keep the process transparent at every step — from platform access through to visa and deployment.</p>
+    </div>
+
+    <div class="steps">
+        <div class="step">
+            <span class="step-num">01 — Access</span>
+            <h3>Create and unlock</h3>
+            <p>Create an account and pay a one-time fee to unlock full job details, employer profiles, and platform
+                access.</p>
         </div>
-        <div class="tier-box">
-            <span class="tag">Tier 2</span>
-            <h3>Application & verification</h3>
-            <p>Upload CVs, passports, and supporting documents, then pay the job-specific verification fee as the
-                application is reviewed by admin and partners.</p>
+        <div class="step">
+            <span class="step-num">02 — Verification</span>
+            <h3>Apply and verify</h3>
+            <p>Upload your CV, passport, and supporting documents. Our team and partners review every application
+                carefully.</p>
         </div>
-        <div class="tier-box">
-            <span class="tag">Tier 3</span>
-            <h3>Visa & placement</h3>
-            <p>Approved applicants move into visa processing, recruitment placement, travel arrangements, and deployment
-                support with a higher-level fee.</p>
+        <div class="step">
+            <span class="step-num">03 — Placement</span>
+            <h3>Visa and deployment</h3>
+            <p>Approved candidates move into visa processing, travel arrangements, onboarding, and full deployment
+                support.</p>
         </div>
     </div>
 </section>
+
+<!-- ============ FEATURE SPLIT ============ -->
+<section class="section">
+    <div class="feature-split">
+        <div class="feature-image">
+            <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=900&q=80"
+                alt="Candidate preparing documents">
+        </div>
+        <div>
+            <div class="section-head" style="margin-bottom: 28px;">
+                <span class="kicker">Why candidates choose us</span>
+                <h2>Real jobs. Real verification. No shortcuts.</h2>
+            </div>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <span class="mark"><svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <rect x="5" y="11" width="14" height="9" rx="2" />
+                            <path d="M8 11V8.5A4 4 0 0 1 12 4.5a4 4 0 0 1 4 4V11" />
+                        </svg></span>
+                    <div>
+                        <h4>Verified employers only</h4>
+                        <p>Every listing is checked by our admin team before it goes live. No ghost jobs, no
+                            middlemen.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <span class="mark"><svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <path
+                                d="M14 2.5H7.5A2.5 2.5 0 0 0 5 5v14a2.5 2.5 0 0 0 2.5 2.5h9A2.5 2.5 0 0 0 19 19V7.5L14 2.5Z" />
+                            <path d="M14 2.5V7.5H19" />
+                            <path d="M8.5 12h7" />
+                            <path d="M8.5 16h7" />
+                        </svg></span>
+                    <div>
+                        <h4>Document vault</h4>
+                        <p>Store your passport, CV, and certificates securely. Reuse them across every application.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <span class="mark"><svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
+                            <path d="m9 12 2 2 4-5" />
+                        </svg></span>
+                    <div>
+                        <h4>Visa readiness check</h4>
+                        <p>See exactly what you need before you apply. No surprises, no wasted fees.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ STATS BAND ============ -->
+<section class="section">
+    <div class="stats-band">
+        <div class="stat">
+            <strong>18</strong>
+            <span>Destination countries</span>
+        </div>
+        <div class="stat">
+            <strong>4,200+</strong>
+            <span>Candidates placed</span>
+        </div>
+        <div class="stat">
+            <strong>92%</strong>
+            <span>Visa success rate</span>
+        </div>
+        <div class="stat">
+            <strong>6–8 wks</strong>
+            <span>Average processing</span>
+        </div>
+    </div>
+</section>
+
+{% if partners %}
+<section class="section" aria-label="Trusted partners">
+    <div class="section-head">
+        <span class="kicker">Trusted partners</span>
+        <h2>Strong collaborations across the recruitment ecosystem.</h2>
+    </div>
+    <div class="partners-marquee-wrap">
+        <div class="partners-marquee">
+            {% for partner in partners %}
+            <div class="partner-pill" title="{{ partner.name }}">
+                {% if partner.display_logo %}
+                <img src="{{ partner.display_logo }}" alt="{{ partner.name }} logo">
+                {% endif %}
+                <span>{{ partner.name }}</span>
+            </div>
+            {% endfor %}
+            {% for partner in partners %}
+            <div class="partner-pill" title="{{ partner.name }}">
+                {% if partner.display_logo %}
+                <img src="{{ partner.display_logo }}" alt="{{ partner.name }} logo">
+                {% endif %}
+                <span>{{ partner.name }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ============ TESTIMONIALS ============ -->
+<section class="section">
+    <div class="section-head">
+        <span class="kicker">What our members say</span>
+        <h2>Real people. Real placements.</h2>
+    </div>
+
+    <div class="testimonial-grid">
+        <figure class="testimonial">
+            <blockquote>I'd applied through three other agencies before HBC. Six weeks later I was in Doha.</blockquote>
+            <figcaption>
+                <span class="avatar-sm">JM</span>
+                <div>
+                    <strong>James Mwangi</strong>
+                    <span>Placed at a logistics firm, Qatar</span>
+                </div>
+            </figcaption>
+        </figure>
+        <figure class="testimonial">
+            <blockquote>The document vault saved me weeks. Everything was ready before I even applied.</blockquote>
+            <figcaption>
+                <span class="avatar-sm">AN</span>
+                <div>
+                    <strong>Amina Noor</strong>
+                    <span>Placed in healthcare, UAE</span>
+                </div>
+            </figcaption>
+        </figure>
+        <figure class="testimonial">
+            <blockquote>They told me the exact cost at every stage. No hidden fees, no surprises.</blockquote>
+            <figcaption>
+                <span class="avatar-sm">PO</span>
+                <div>
+                    <strong>Peter Otieno</strong>
+                    <span>Placed in construction, Saudi Arabia</span>
+                </div>
+            </figcaption>
+        </figure>
+    </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta-band">
+    <div>
+        <h2>Ready to start your application?</h2>
+        <p>Create a free account, browse verified roles, and only pay when you're ready to move forward.</p>
+    </div>
+    <div class="cta-actions">
+        <a href="{% url 'client:jobs' %}" class="btn btn-primary">Browse jobs</a>
+        <a href="{% url 'client:register' %}" class="btn btn-secondary">Register</a>
+    </div>
+</section>
+
 {% endblock %}

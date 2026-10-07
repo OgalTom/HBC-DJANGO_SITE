@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} · HBC Job Majuu{% endblock %}
+{% block content %}
+<section class="story-shell">
+    <article class="story-article">
+        {% if article.preview_image %}
+        <div class="story-cover">
+            <img src="{{ article.preview_image }}" alt="{{ article.image_alt|default:article.title }}">
+        </div>
+        {% endif %}
+
+        <div class="story-meta">
+            <span class="story-category">{{ article.get_category_display }}</span>
+            <span>•</span>
+            <span>{{ article.author_name }}</span>
+            <span>•</span>
+            <span>{{ article.read_time }}</span>
+            {% if article.published_at %}
+            <span>•</span>
+            <span>{{ article.published_at|date:"F j, Y" }}</span>
+            {% endif %}
+        </div>
+
+        <h1>{{ article.title }}</h1>
+
+        {% if article.excerpt %}
+        <p class="story-excerpt">{{ article.excerpt }}</p>
+        {% endif %}
+
+        <div class="story-author-strip">
+            <div class="author-avatar">{{ article.author_name|slice:":1"|upper }}</div>
+            <div>
+                <strong>{{ article.author_name }}</strong>
+                <p>Contributor · HBC Job Majuu</p>
+            </div>
+        </div>
+
+        <div class="story-body">
+            {{ article.body|linebreaks }}
+        </div>
+    </article>
+
+    {% if related_articles %}
+    <aside class="related-panel">
+        <h2>More reading</h2>
+        <div class="related-stack">
+            {% for item in related_articles %}
+            <a href="{% if article.category == 'STORY' %}{% url 'client:story_detail' item.slug %}{% else %}{% url 'client:blog_detail' item.slug %}{% endif %}"
+                class="related-card">
+                {% if item.preview_image %}
+                <img src="{{ item.preview_image }}" alt="{{ item.image_alt|default:item.title }}">
+                {% endif %}
+                <div>
+                    <span>{{ item.get_category_display }}</span>
+                    <h3>{{ item.title }}</h3>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </aside>
+    {% endif %}
+</section>
+
+<style>
+    .story-shell {
+        width: min(1180px, calc(100% - 40px));
+        margin: 42px auto 72px;
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(260px, 0.8fr);
+        gap: 28px;
+        align-items: start;
+    }
+
+    .story-article {
+        background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+        border: 1px solid #e6ebf2;
+        border-radius: 28px;
+        padding: 32px;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+    }
+
+    .story-cover {
+        overflow: hidden;
+        border-radius: 22px;
+        margin-bottom: 24px;
+        background: #edf5ff;
+    }
+
+    .story-cover img {
+        display: block;
+        width: 100%;
+        height: 420px;
+        object-fit: cover;
+    }
+
+    .story-meta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        color: #4f6d8d;
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 14px;
+    }
+
+    .story-category {
+        color: #0f4c81;
+    }
+
+    .story-article h1 {
+        font-size: clamp(2.4rem, 4vw, 4.2rem);
+        line-height: 1.05;
+        letter-spacing: -0.06em;
+        margin-bottom: 18px;
+        color: #0b1f33;
+    }
+
+    .story-excerpt {
+        font-size: 1.14rem;
+        color: #425671;
+        margin-bottom: 22px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid #edf2f7;
+        line-height: 1.8;
+    }
+
+    .story-author-strip {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: #eef6fb;
+        border: 1px solid #dfeaf8;
+    }
+
+    .author-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0f766e, #0f4c81);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 800;
+    }
+
+    .story-author-strip strong {
+        display: block;
+        color: #112843;
+    }
+
+    .story-author-strip p {
+        color: #59718b;
+        font-size: 0.82rem;
+    }
+
+    .story-body {
+        font-size: 1.07rem;
+        line-height: 1.9;
+        color: #26374f;
+    }
+
+    .story-body p {
+        margin-bottom: 20px;
+    }
+
+    .story-body p:first-child::first-letter {
+        float: left;
+        font-size: 4.5rem;
+        line-height: 0.9;
+        padding-right: 10px;
+        padding-top: 8px;
+        color: #0f4c81;
+        font-weight: 800;
+    }
+
+    .related-panel {
+        background: #fff;
+        border: 1px solid #e6ebf2;
+        border-radius: 22px;
+        padding: 22px 18px;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+        position: sticky;
+        top: 100px;
+    }
+
+    .related-panel h2 {
+        font-size: 1.15rem;
+        margin-bottom: 18px;
+        color: #102744;
+    }
+
+    .related-stack {
+        display: grid;
+        gap: 16px;
+    }
+
+    .related-card {
+        display: grid;
+        grid-template-columns: 92px 1fr;
+        gap: 12px;
+        padding: 10px;
+        border: 1px solid #edf2f7;
+        border-radius: 14px;
+        background: #f9fbff;
+    }
+
+    .related-card img {
+        width: 92px;
+        height: 92px;
+        border-radius: 12px;
+        object-fit: cover;
+    }
+
+    .related-card span {
+        display: block;
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #4f6d8d;
+        margin-bottom: 6px;
+    }
+
+    .related-card h3 {
+        font-size: 1rem;
+        line-height: 1.3;
+        color: #16263d;
+    }
+
+    @media (max-width: 860px) {
+        .story-shell {
+            grid-template-columns: 1fr;
+        }
+
+        .related-panel {
+            position: static;
+        }
+    }
+</style>
+{% endblock %}

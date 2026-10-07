@@ -1,0 +1,423 @@
+﻿{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Account · HBC Job Majuu{% endblock %}
+
+{% block extra_head %}
+<style>
+    .auth-page {
+        padding: 52px 0 80px;
+        background: #f5f7fa;
+    }
+
+    .auth-shell {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+    }
+
+    .auth-layout {
+        display: grid;
+        grid-template-columns: 1fr 1.1fr;
+        min-height: 760px;
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 24px 60px rgba(15, 45, 73, 0.08);
+    }
+
+    .auth-story {
+        position: relative;
+        padding: 52px 42px;
+        background:
+            linear-gradient(180deg, rgba(11, 46, 77, 0.82), rgba(11, 46, 77, 0.92)),
+            url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format%26fit=crop&w=1200&q=80') center/cover no-repeat;
+        color: #fff;
+    }
+
+    .auth-story::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(10, 26, 40, 0.14);
+    }
+
+    .story-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .story-badge {
+        display: inline-flex;
+        align-items: center;
+        align-self: flex-start;
+        padding: 8px 12px;
+        margin-bottom: 18px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .auth-story h1 {
+        color: #fff;
+        font-size: clamp(2.2rem, 3vw, 3.2rem);
+        margin: 0 0 18px;
+        line-height: 1.08;
+        letter-spacing: -0.05em;
+    }
+
+    .auth-story p {
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 1.04rem;
+        line-height: 1.8;
+        max-width: 500px;
+        margin: 0 0 28px;
+    }
+
+    .story-points {
+        display: grid;
+        gap: 14px;
+        margin-top: 8px;
+    }
+
+    .story-points li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
+    }
+
+    .story-points .dot {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.18);
+        font-size: 0.8rem;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .auth-panel-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 52px 44px;
+        background: #fff;
+    }
+
+    .auth-card {
+        width: min(100%, 470px);
+    }
+
+    .eyebrow {
+        display: inline-block;
+        margin-bottom: 14px;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--accent);
+    }
+
+    .auth-card h2 {
+        font-size: clamp(2rem, 2.3vw, 2.5rem);
+        margin: 0 0 10px;
+        letter-spacing: -0.04em;
+    }
+
+    .subtext {
+        margin: 0 0 22px;
+        color: var(--ink-soft);
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+
+    .social-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 46px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        font-weight: 600;
+        transition: all .15s ease;
+        cursor: pointer;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 22px rgba(15, 40, 70, 0.08);
+    }
+
+    .btn-secondary {
+        background: #fff;
+        color: var(--ink);
+    }
+
+    .btn-primary {
+        background: var(--brand);
+        color: #fff;
+        border-color: var(--brand);
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 8px 0 18px;
+        color: var(--muted);
+        font-size: .74rem;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: "";
+        display: block;
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+    }
+
+    .auth-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px 14px;
+    }
+
+    .form-field {
+        margin-bottom: 16px;
+    }
+
+    .full-span {
+        grid-column: 1 / -1;
+    }
+
+    .auth-card label {
+        display: block;
+        margin-bottom: 7px;
+        font-size: .85rem;
+        font-weight: 700;
+        color: var(--ink);
+    }
+
+    .auth-card .form-input,
+    .auth-card select,
+    .auth-card textarea {
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 14px;
+        border: 1px solid #dfe6ee;
+        border-radius: 12px;
+        color: var(--ink);
+        background: #fff;
+        font-size: 0.96rem;
+    }
+
+    .auth-card .form-input:focus,
+    .auth-card select:focus,
+    .auth-card textarea:focus {
+        outline: none;
+        border-color: rgba(15, 76, 129, 0.55);
+        box-shadow: 0 0 0 4px rgba(15, 76, 129, 0.09);
+    }
+
+    .auth-card .field-error {
+        display: block;
+        margin-top: 6px;
+        font-size: .8rem;
+        color: #b91c1c;
+        font-weight: 600;
+    }
+
+    .auth-card .nonfield-errors {
+        margin-bottom: 16px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #fecaca;
+        background: #fff5f5;
+        color: #991b1b;
+        font-size: .82rem;
+        line-height: 1.5;
+    }
+
+    .btn-block {
+        width: 100%;
+        min-height: 50px;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        margin-top: 6px;
+    }
+
+    .fine-print {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: .78rem;
+        line-height: 1.6;
+        text-align: center;
+    }
+
+    .footer-prompt {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+        text-align: center;
+        color: var(--ink-soft);
+        font-size: .92rem;
+    }
+
+    .footer-prompt a {
+        color: var(--brand);
+        font-weight: 700;
+    }
+
+    @media (max-width: 980px) {
+        .auth-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .auth-story {
+            min-height: 420px;
+        }
+
+        .auth-panel-wrap {
+            padding-top: 30px;
+            padding-bottom: 42px;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .auth-page {
+            padding: 24px 0 48px;
+        }
+
+        .auth-shell {
+            width: min(100%, calc(100% - 18px));
+        }
+
+        .auth-story,
+        .auth-panel-wrap {
+            padding-left: 22px;
+            padding-right: 22px;
+        }
+
+        .auth-grid,
+        .social-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    <div class="auth-shell">
+        <div class="auth-layout">
+            <div class="auth-story">
+                <div class="story-inner">
+                    <div class="story-badge">Why HBC Job Majuu</div>
+                    <h1>Build a better career path.</h1>
+                    <p>Discover trusted jobs, access application support, and move confidently from profile to placement
+                        with the right guidance behind you.</p>
+
+                    <ul class="story-points">
+                        <li><span class="dot"><svg class="icon-svg sm" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
+                                    <path d="m9 12 2 2 4-5" />
+                                </svg></span> Verified employer access</li>
+                        <li><span class="dot"><svg class="icon-svg sm" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
+                                    <path d="m9 12 2 2 4-5" />
+                                </svg></span> Application tracking and updates</li>
+                        <li><span class="dot"><svg class="icon-svg sm" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
+                                    <path d="m9 12 2 2 4-5" />
+                                </svg></span> Profile, visa, and document readiness</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="auth-panel-wrap">
+                <div class="auth-card">
+                    <span class="eyebrow">Create account</span>
+                    <h2>Join today</h2>
+                    <p class="subtext">Start your job search with a secure profile built for trusted placements.</p>
+
+                    <div class="social-row">
+                        <a href="{% url 'client:google_login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}"
+                            class="btn btn-secondary">Google</a>
+                        <a href="{% url 'client:login' %}" class="btn btn-secondary">Sign in</a>
+                    </div>
+
+                    <div class="divider">Or register with email</div>
+
+                    <form method="post" action="{% url 'client:register' %}" novalidate>
+                        {% csrf_token %}
+
+                        {% if register_form.non_field_errors %}
+                        <div class="nonfield-errors">
+                            {% for err in register_form.non_field_errors %}{{ err }}{% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="auth-grid">
+                            {% for field in register_form %}
+                            <div
+                                class="form-field {% if field.name in 'first_name,last_name,email,username,password1,password2' %}full-span{% endif %}">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}
+                                <span class="field-error">{{ field.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">Create my account</button>
+                    </form>
+
+                    <p class="fine-print">By creating an account, you agree to the platform terms and privacy policy.
+                    </p>
+
+                    <div class="footer-prompt">
+                        <span>Already registered? </span><a href="{% url 'client:login' %}">Sign in</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

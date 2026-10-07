@@ -17,7 +17,10 @@ urlpatterns = [
     path("my-applications/", views.my_applications, name="my_applications"),
     path("visas/", views.visas, name="visas"),
     path("stories/", views.stories, name="stories"),
+    path("stories/<slug:slug>/", views.story_detail, name="story_detail"),
+    path("gallery/", views.gallery, name="gallery"),
     path("blog/", views.blog, name="blog"),
+    path("blog/<slug:slug>/", views.blog_detail, name="blog_detail"),
 
     # Auth
     path("login/", views.CustomLoginView.as_view(), name="login"),

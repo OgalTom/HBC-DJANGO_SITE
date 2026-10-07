@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Gallery · HBC Job Majuu{% endblock %}
+{% block content %}
+<section class="gallery-shell">
+    <div class="gallery-intro">
+        <p class="eyebrow">Our journey</p>
+        <h1>Moments from recruitment, onboarding, and travel support</h1>
+        <p>Snapshots from field visits, interviews, orientation, and successful placements across the sectors we serve.
+        </p>
+    </div>
+
+    {% if gallery_items %}
+    <div class="gallery-grid">
+        {% for item in gallery_items %}
+        <article class="gallery-card">
+            <a href="{{ item.image_url }}" target="_blank" rel="noopener" class="gallery-image-wrap">
+                <img src="{{ item.image_url }}" alt="{{ item.title }}">
+            </a>
+            <div class="gallery-copy">
+                <span class="gallery-tag">Gallery</span>
+                <h2>{{ item.title }}</h2>
+                {% if item.description %}
+                <p>{{ item.description }}</p>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h2>No gallery items published yet.</h2>
+        <p>New images will appear here once they are added through the admin gallery.</p>
+    </div>
+    {% endif %}
+</section>
+
+<style>
+    .gallery-shell {
+        width: min(1180px, calc(100% - 40px));
+        margin: 42px auto 72px;
+    }
+
+    .gallery-intro {
+        margin-bottom: 28px;
+    }
+
+    .eyebrow {
+        color: #0f4c81;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 0.78rem;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .gallery-intro h1 {
+        font-size: clamp(2.2rem, 4vw, 4rem);
+        letter-spacing: -0.06em;
+        line-height: 1.06;
+        color: #0b1f33;
+        margin-bottom: 12px;
+    }
+
+    .gallery-intro p:last-child {
+        max-width: 760px;
+        color: #43607d;
+        font-size: 1.08rem;
+        line-height: 1.7;
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 26px;
+    }
+
+    .gallery-card {
+        background: #fff;
+        border: 1px solid #e6ebf2;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.04);
+    }
+
+    .gallery-image-wrap {
+        display: block;
+        background: #edf5ff;
+    }
+
+    .gallery-image-wrap img {
+        display: block;
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        transition: transform 0.25s ease;
+    }
+
+    .gallery-card:hover .gallery-image-wrap img {
+        transform: scale(1.04);
+    }
+
+    .gallery-copy {
+        padding: 18px 18px 20px;
+    }
+
+    .gallery-tag {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #eef6fb;
+        color: #0f4c81;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .gallery-copy h2 {
+        margin: 16px 0 10px;
+        color: #102744;
+        font-size: 1.45rem;
+        line-height: 1.25;
+        letter-spacing: -0.04em;
+    }
+
+    .gallery-copy p {
+        color: #4c6079;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .empty-state {
+        background: #fff;
+        border-radius: 22px;
+        border: 1px solid #e6ebf2;
+        padding: 32px;
+        color: #45627d;
+    }
+
+    @media (max-width: 900px) {
+        .gallery-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 640px) {
+        .gallery-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

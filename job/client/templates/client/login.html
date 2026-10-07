@@ -1,0 +1,453 @@
+﻿{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sign In · HBC Job Majuu{% endblock %}
+
+{% block extra_head %}
+<style>
+    .auth-page {
+        padding: 52px 0 80px;
+        background: #f5f7fa;
+    }
+
+    .auth-shell {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+    }
+
+    .auth-layout {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        min-height: 720px;
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 24px 60px rgba(15, 45, 73, 0.08);
+    }
+
+    .auth-visual {
+        position: relative;
+        padding: 44px 42px 36px;
+        background:
+            linear-gradient(180deg, rgba(11, 46, 77, 0.82), rgba(11, 46, 77, 0.9)),
+            url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format%26fit=crop&w=1200&q=80') center/cover no-repeat;
+        color: #fff;
+    }
+
+    .auth-visual::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(9, 28, 48, 0.12);
+    }
+
+    .visual-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    .visual-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        width: fit-content;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .visual-copy {
+        max-width: 440px;
+        margin-top: 18px;
+    }
+
+    .visual-copy h1 {
+        color: #fff;
+        font-size: clamp(2rem, 3vw, 3rem);
+        line-height: 1.1;
+        margin: 0 0 18px;
+    }
+
+    .visual-copy p {
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 1.04rem;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .visual-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 26px;
+    }
+
+    .metric {
+        padding: 16px 14px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(4px);
+    }
+
+    .metric strong {
+        display: block;
+        font-size: 1.5rem;
+        color: #fff;
+        line-height: 1.2;
+    }
+
+    .metric span {
+        display: block;
+        color: rgba(255, 255, 255, 0.76);
+        font-size: 0.78rem;
+        margin-top: 4px;
+    }
+
+    .visual-image {
+        margin-top: 30px;
+        border-radius: 22px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: 0 28px 45px rgba(0, 0, 0, 0.16);
+    }
+
+    .visual-image img {
+        display: block;
+        width: 100%;
+        height: 260px;
+        object-fit: cover;
+    }
+
+    .auth-panel-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 52px 44px;
+        background: #fff;
+    }
+
+    .auth-card {
+        width: min(100%, 430px);
+    }
+
+    .eyebrow {
+        display: inline-block;
+        margin-bottom: 14px;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--accent);
+    }
+
+    .auth-card h2 {
+        font-size: clamp(2rem, 2.3vw, 2.5rem);
+        margin: 0 0 10px;
+        letter-spacing: -0.04em;
+    }
+
+    .subtext {
+        margin: 0 0 22px;
+        color: var(--ink-soft);
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+
+    .social-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 46px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        font-weight: 600;
+        transition: all .15s ease;
+        cursor: pointer;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 22px rgba(15, 40, 70, 0.08);
+    }
+
+    .btn-secondary {
+        background: #fff;
+        color: var(--ink);
+    }
+
+    .btn-primary {
+        background: var(--brand);
+        color: #fff;
+        border-color: var(--brand);
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 8px 0 18px;
+        color: var(--muted);
+        font-size: .74rem;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: "";
+        display: block;
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+    }
+
+    .form-field {
+        margin-bottom: 18px;
+    }
+
+    .auth-card label {
+        display: block;
+        margin-bottom: 7px;
+        font-size: .85rem;
+        font-weight: 700;
+        color: var(--ink);
+    }
+
+    .auth-card .form-input {
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 14px;
+        border: 1px solid #dfe6ee;
+        border-radius: 12px;
+        background: #fff;
+        color: var(--ink);
+        font-size: 0.96rem;
+    }
+
+    .auth-card .form-input:focus {
+        outline: none;
+        border-color: rgba(15, 76, 129, 0.55);
+        box-shadow: 0 0 0 4px rgba(15, 76, 129, 0.09);
+    }
+
+    .auth-card .field-error {
+        display: block;
+        margin-top: 6px;
+        font-size: .8rem;
+        color: #b91c1c;
+        font-weight: 600;
+    }
+
+    .auth-card .nonfield-errors {
+        margin-bottom: 16px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #fecaca;
+        background: #fff5f5;
+        color: #991b1b;
+        font-size: .82rem;
+        line-height: 1.5;
+    }
+
+    .meta-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 6px 0 18px;
+        color: var(--muted);
+        font-size: 0.85rem;
+    }
+
+    .meta-row a {
+        color: var(--brand);
+        font-weight: 700;
+    }
+
+    .btn-block {
+        width: 100%;
+        min-height: 50px;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .fine-print {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: .78rem;
+        line-height: 1.6;
+        text-align: center;
+    }
+
+    .footer-prompt {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+        text-align: center;
+        color: var(--ink-soft);
+        font-size: .92rem;
+    }
+
+    .footer-prompt a {
+        color: var(--brand);
+        font-weight: 700;
+    }
+
+    @media (max-width: 980px) {
+        .auth-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .auth-visual {
+            min-height: 420px;
+        }
+
+        .auth-panel-wrap {
+            padding-top: 30px;
+            padding-bottom: 42px;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .auth-page {
+            padding: 24px 0 48px;
+        }
+
+        .auth-shell {
+            width: min(100%, calc(100% - 18px));
+        }
+
+        .auth-visual,
+        .auth-panel-wrap {
+            padding-left: 22px;
+            padding-right: 22px;
+        }
+
+        .social-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    <div class="auth-shell">
+        <div class="auth-layout">
+            <div class="auth-visual">
+                <div class="visual-inner">
+                    <div>
+                        <div class="visual-badge">HBC Job Majuu</div>
+                        <div class="visual-copy">
+                            <h1>Find work that fits your life.</h1>
+                            <p>Trusted opportunities, streamlined hiring, and a better path to your next role — with
+                                support at every step.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="visual-metrics">
+                            <div class="metric">
+                                <strong>8k+</strong>
+                                <span>candidate matches</span>
+                            </div>
+                            <div class="metric">
+                                <strong>120+</strong>
+                                <span>active employers</span>
+                            </div>
+                            <div class="metric">
+                                <strong>24/7</strong>
+                                <span>application support</span>
+                            </div>
+                        </div>
+
+                        <div class="visual-image">
+                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format%26fit=crop&w=1200&q=80"
+                                alt="Candidates reviewing jobs and documents" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-panel-wrap">
+                <div class="auth-card">
+                    <span class="eyebrow">Welcome back</span>
+                    <h2>Sign in</h2>
+                    <p class="subtext">Access your dashboard, applications, and document vault.</p>
+
+                    <div class="social-row">
+                        <a href="{% url 'client:google_login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}"
+                            class="btn btn-secondary">Google</a>
+                        <a href="{% url 'client:register' %}" class="btn btn-secondary">Create account</a>
+                    </div>
+
+                    <div class="divider">Or continue with email</div>
+
+                    <form method="post" action="{% url 'client:login' %}" novalidate>
+                        {% csrf_token %}
+
+                        {% if login_form.non_field_errors %}
+                        <div class="nonfield-errors">
+                            {% for err in login_form.non_field_errors %}{{ err }}{% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="form-field">
+                            <label for="{{ login_form.username.id_for_label }}">{{ login_form.username.label }}</label>
+                            {{ login_form.username }}
+                            {% if login_form.username.errors %}
+                            <span class="field-error">{{ login_form.username.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-field">
+                            <label for="{{ login_form.password.id_for_label }}">{{ login_form.password.label }}</label>
+                            {{ login_form.password }}
+                            {% if login_form.password.errors %}
+                            <span class="field-error">{{ login_form.password.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="meta-row">
+                            <label
+                                style="display:inline-flex;align-items:center;gap:8px;color:var(--ink-soft);font-weight:600;">
+                                <input type="checkbox" name="remember_me" /> Remember me
+                            </label>
+                            <a href="#">Forgot password?</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+                    </form>
+
+                    <p class="fine-print">By signing in, you agree to the platform terms and privacy policy.</p>
+
+                    <div class="footer-prompt">
+                        <span>New to HBC Job Majuu? </span><a href="{% url 'client:register' %}">Create an account</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

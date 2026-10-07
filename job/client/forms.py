@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
-from .models import Application, Job
+from .models import Application, Article, Job
 
 User = get_user_model()
 
@@ -153,12 +153,81 @@ class ProfileForm(forms.ModelForm):
         }
 
 
+class PlatformStaffForm(UserCreationForm):
+    first_name = forms.CharField(max_length=50, required=True)
+    last_name = forms.CharField(max_length=50, required=True)
+    email = forms.EmailField(required=True)
+    phone_number = forms.CharField(max_length=20, required=True)
+    role = forms.ChoiceField(choices=User.Role.choices)
+
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "email", "phone_number", "role", "password1", "password2")
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("An account with this email already exists.")
+        return email
+
+    def clean_phone_number(self):
+        phone = self.cleaned_data["phone_number"].strip()
+        if User.objects.filter(phone_number=phone).exists():
+            raise forms.ValidationError("An account with this phone number already exists.")
+        return phone
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data["email"].strip().lower()
+        user.phone_number = self.cleaned_data["phone_number"].strip()
+        user.first_name = self.cleaned_data["first_name"].strip()
+        user.last_name = self.cleaned_data["last_name"].strip()
+        user.username = self.cleaned_data["email"].strip().lower()
+        user.is_staff = True
+        user.role = self.cleaned_data["role"]
+        if commit:
+            user.save()
+        return user
+
+
+class ArticleForm(forms.ModelForm):
+    class Meta:
+        model = Article
+        fields = (
+            "title",
+            "slug",
+            "category",
+            "excerpt",
+            "body",
+            "featured_image",
+            "image_alt",
+            "author_name",
+            "read_time",
+            "status",
+            "published_at",
+        )
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-input", "placeholder": "A story headline"}),
+            "slug": forms.TextInput(attrs={"class": "form-input", "placeholder": "article-slug"}),
+            "category": forms.Select(attrs={"class": "form-input"}),
+            "excerpt": forms.Textarea(attrs={"class": "form-input", "rows": 3, "placeholder": "Short summary shown in article cards"}),
+            "body": forms.Textarea(attrs={"class": "form-input", "rows": 10, "placeholder": "Write the full article content here"}),
+            "featured_image": forms.URLInput(attrs={"class": "form-input", "placeholder": "https://example.com/article-image.jpg"}),
+            "image_alt": forms.TextInput(attrs={"class": "form-input", "placeholder": "Descriptive alt text"}),
+            "author_name": forms.TextInput(attrs={"class": "form-input", "placeholder": "HBC Job Majuu"}),
+            "read_time": forms.TextInput(attrs={"class": "form-input", "placeholder": "4 min read"}),
+            "status": forms.Select(attrs={"class": "form-input"}),
+            "published_at": forms.DateTimeInput(attrs={"class": "form-input", "type": "datetime-local"}),
+        }
+
+
 class JobForm(forms.ModelForm):
     class Meta:
         model = Job
         fields = (
             "title",
             "country",
+            "country_flag",
             "sector",
             "description_masked",
             "description_full",
@@ -168,18 +237,21 @@ class JobForm(forms.ModelForm):
             "tier_3_fee",
             "status",
             "visibility",
+            "cover_image",
             "image_url",
             "image_alt",
         )
         widgets = {
             "title": forms.TextInput(attrs={"placeholder": "Senior ICU Nurse"}),
             "country": forms.TextInput(attrs={"placeholder": "Kenya"}),
+            "country_flag": forms.TextInput(attrs={"placeholder": "🇰🇪 (auto-generated if left blank)"}),
             "sector": forms.TextInput(attrs={"placeholder": "Healthcare"}),
             "description_masked": forms.Textarea(attrs={"rows": 3, "placeholder": "Short candidate-facing summary"}),
             "description_full": forms.Textarea(attrs={"rows": 7, "placeholder": "Full job description, experience requirements, and responsibilities"}),
             "salary_range": forms.TextInput(attrs={"placeholder": "KES 250,000 – 350,000"}),
             "tier_2_fee": forms.NumberInput(attrs={"step": "0.01"}),
             "tier_3_fee": forms.NumberInput(attrs={"step": "0.01"}),
+            "cover_image": forms.URLInput(attrs={"placeholder": "https://example.com/job-cover-image.jpg"}),
             "image_url": forms.URLInput(attrs={"placeholder": "https://example.com/job-image.jpg"}),
             "image_alt": forms.TextInput(attrs={"placeholder": "Hospital nurse role in Nairobi"}),
         }

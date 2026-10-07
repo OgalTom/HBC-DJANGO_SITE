@@ -1,16 +1,236 @@
 {% extends "base.html" %}
 {% block title %}Blog · HBC Job Majuu{% endblock %}
 {% block content %}
-<section class="card" style="padding:32px;">
-    <h1 style="margin-top:0;">Insights & updates</h1>
-    <p>Regulatory updates, immigration guidance, skills roadmaps, and the latest happenings in global healthcare
-        mobility.</p>
-
-    <div class="card"
-        style="margin-top:18px; padding:20px; border:1px solid #e5eaf0; border-radius:12px; background:#fff;">
-        <h3>How to prepare for overseas healthcare recruitment</h3>
-        <p>Learn about licensing, documentation, interview prep, and how to position your profile for overseas
-            employers.</p>
+<section class="editorial-wrap">
+    <div class="editorial-intro">
+        <p class="eyebrow">Insights & updates</p>
+        <h1>Practical knowledge for every stage of your move</h1>
+        <p>Guidance on documentation, licensing, interview preparation, immigration pathways, and the decisions that
+            help candidates move from interest to readiness with confidence.</p>
     </div>
+
+    {% if articles %}
+    {% with lead_article=articles.0 %}
+    <a href="{% url 'client:blog_detail' lead_article.slug %}" class="feature-story">
+        {% if lead_article.preview_image %}
+        <div class="feature-image-wrap">
+            <img src="{{ lead_article.preview_image }}" alt="{{ lead_article.image_alt|default:lead_article.title }}">
+        </div>
+        {% endif %}
+        <div class="feature-copy">
+            <span class="story-tag">Featured insight</span>
+            <h2>{{ lead_article.title }}</h2>
+            <p>{{ lead_article.excerpt|default:lead_article.body|truncatechars:200 }}</p>
+            <div class="story-foot">
+                <span>{{ lead_article.author_name }}</span>
+                <span>{{ lead_article.read_time }}</span>
+            </div>
+        </div>
+    </a>
+    {% endwith %}
+
+    <div class="story-grid">
+        {% for article in articles|slice:"1:" %}
+        <a href="{% url 'client:blog_detail' article.slug %}" class="story-card">
+            {% if article.preview_image %}
+            <img src="{{ article.preview_image }}" alt="{{ article.image_alt|default:article.title }}">
+            {% endif %}
+            <div class="story-copy">
+                <span class="story-tag">{{ article.get_category_display }}</span>
+                <h2>{{ article.title }}</h2>
+                <p>{{ article.excerpt|default:article.body|truncatechars:170 }}</p>
+                <div class="story-foot">
+                    <span>{{ article.author_name }}</span>
+                    <span>{{ article.read_time }}</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h2>No blog posts published yet.</h2>
+        <p>Fresh guidance and news will appear here once they are published from the admin panel.</p>
+    </div>
+    {% endif %}
 </section>
+
+<style>
+    .editorial-wrap {
+        width: min(1180px, calc(100% - 40px));
+        margin: 42px auto 72px;
+    }
+
+    .editorial-intro {
+        margin-bottom: 28px;
+    }
+
+    .eyebrow {
+        color: #0f4c81;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 0.78rem;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .editorial-intro h1 {
+        font-size: clamp(2.5rem, 4vw, 4.5rem);
+        letter-spacing: -0.06em;
+        line-height: 1.03;
+        color: #0b1f33;
+        margin-bottom: 12px;
+    }
+
+    .editorial-intro p:last-child {
+        max-width: 770px;
+        color: #43607d;
+        font-size: 1.08rem;
+        line-height: 1.7;
+    }
+
+    .feature-story {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        background: linear-gradient(135deg, #ffffff, #f5f9ff);
+        border: 1px solid #dfeaf8;
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 16px 40px rgba(17, 33, 58, 0.08);
+        margin-bottom: 30px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .feature-story:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 22px 50px rgba(17, 33, 58, 0.12);
+    }
+
+    .feature-image-wrap {
+        min-height: 360px;
+        background: #edf5ff;
+    }
+
+    .feature-image-wrap img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .feature-copy {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 32px 30px;
+    }
+
+    .feature-copy h2 {
+        font-size: clamp(2rem, 2.7vw, 3rem);
+        line-height: 1.08;
+        letter-spacing: -0.05em;
+        color: #0e223a;
+        margin: 18px 0 12px;
+    }
+
+    .feature-copy p {
+        color: #4d627a;
+        font-size: 1.05rem;
+        line-height: 1.8;
+        margin-bottom: 18px;
+    }
+
+    .story-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 28px;
+    }
+
+    .story-card {
+        display: block;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #e6ebf2;
+        border-radius: 22px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .story-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 36px rgba(15, 23, 42, 0.07);
+    }
+
+    .story-card img {
+        display: block;
+        width: 100%;
+        height: 240px;
+        object-fit: cover;
+        background: #edf3fa;
+    }
+
+    .story-copy {
+        padding: 20px 20px 18px;
+    }
+
+    .story-tag {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #eef6fb;
+        color: #0f4c81;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .story-card h2 {
+        margin: 16px 0 10px;
+        color: #102744;
+        font-size: 1.55rem;
+        line-height: 1.2;
+        letter-spacing: -0.04em;
+    }
+
+    .story-card p {
+        color: #4c6079;
+        margin-bottom: 18px;
+        line-height: 1.7;
+    }
+
+    .story-foot {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 0.8rem;
+        color: #68809d;
+        border-top: 1px solid #edf2f7;
+        padding-top: 12px;
+    }
+
+    .empty-state {
+        background: #fff;
+        border-radius: 22px;
+        border: 1px solid #e6ebf2;
+        padding: 32px;
+        color: #45627d;
+    }
+
+    @media (max-width: 900px) {
+        .feature-story {
+            grid-template-columns: 1fr;
+        }
+
+        .story-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .story-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 {% endblock %}

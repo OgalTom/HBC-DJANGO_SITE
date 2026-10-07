@@ -18,7 +18,11 @@ from .forms import (
 
 
 def index(request):
-    return render(request, "home.html", {"title": "Healthcare recruitment made clear"})
+    partners = Partner.objects.filter(is_published=True).order_by("sort_order", "name")
+    return render(request, "home.html", {
+        "title": "Healthcare recruitment made clear",
+        "partners": partners,
+    })
 
 
 def about(request):
@@ -28,7 +32,7 @@ def about(request):
 # ---------- AUTH ----------
 
 class CustomLoginView(LoginView):
-    template_name = "client/auth.html"
+    template_name = "client/login.html"
     authentication_form = LoginForm
     redirect_authenticated_user = True
 
@@ -42,8 +46,8 @@ class CustomLoginView(LoginView):
     def get_success_url(self):
         user = self.request.user
         if user.is_authenticated:
-            if user.role == "ADMIN_HANDLER":
-                return "/admin-panel/"
+            if _is_platform_staff(user):
+                return "/admin/"
             if user.role == "PARTNER":
                 return "/partner-panel/"
         return "/dashboard/"
@@ -70,7 +74,7 @@ def register_view(request):
     else:
         form = RegisterForm()
 
-    return render(request, "client/auth.html", {
+    return render(request, "client/register.html", {
         "active_tab": "register",
         "register_form": form,
         "login_form": LoginForm(),
@@ -82,7 +86,7 @@ from django.db.models import Count, Q, Sum
 from django.shortcuts import render
 from django.utils import timezone
 
-from .models import Application, Job, Transaction, User, UserAccessUnlock
+from .models import Application, Article, GalleryItem, Job, Partner, Transaction, User, UserAccessUnlock
 
 
 @login_required
@@ -194,7 +198,7 @@ def jobs(request):
     can_view_member_jobs = (
         user.is_authenticated
         and (
-            user.role in ("ADMIN_HANDLER", "PARTNER")
+            _is_platform_staff(user)
             or user.has_active_tier(UserAccessUnlock.Tier.TIER_1)
             or user.membership_tier in ("MEMBER", "PLACED")
         )
@@ -263,7 +267,7 @@ def job_detail(request, job_id):
     can_view_member_jobs = (
         user.is_authenticated
         and (
-            user.role in ("ADMIN_HANDLER", "PARTNER")
+            _is_platform_staff(user)
             or user.has_active_tier(UserAccessUnlock.Tier.TIER_1)
             or user.membership_tier in ("MEMBER", "PLACED")
         )
@@ -401,11 +405,69 @@ def visas(request):
 
 
 def stories(request):
-    return render(request, "client/stories.html", {"title": "Stories"})
+    articles = list(
+        Article.objects.filter(
+            category=Article.Category.STORY,
+        ).filter(Q(status=Article.Status.PUBLISHED) | Q(is_published=True)).order_by("-published_at", "-created_at")
+    )
+    return render(request, "client/stories.html", {
+        "title": "Stories",
+        "articles": articles,
+    })
+
+
+def story_detail(request, slug):
+    article = get_object_or_404(
+        Article.objects.filter(category=Article.Category.STORY).filter(Q(status=Article.Status.PUBLISHED) | Q(is_published=True)),
+        slug=slug,
+    )
+    related_articles = list(
+        Article.objects.filter(
+            category=Article.Category.STORY,
+        ).filter(Q(status=Article.Status.PUBLISHED) | Q(is_published=True)).exclude(id=article.id).order_by("-published_at")[:3]
+    )
+    return render(request, "client/article_detail.html", {
+        "title": article.title,
+        "article": article,
+        "related_articles": related_articles,
+    })
 
 
 def blog(request):
-    return render(request, "client/blog.html", {"title": "Blog"})
+    articles = list(
+        Article.objects.filter(
+            category=Article.Category.BLOG,
+        ).filter(Q(status=Article.Status.PUBLISHED) | Q(is_published=True)).order_by("-published_at", "-created_at")
+    )
+    return render(request, "client/blog.html", {
+        "title": "Blog",
+        "articles": articles,
+    })
+
+
+def blog_detail(request, slug):
+    article = get_object_or_404(
+        Article.objects.filter(category=Article.Category.BLOG).filter(Q(status=Article.Status.PUBLISHED) | Q(is_published=True)),
+        slug=slug,
+    )
+    related_articles = list(
+        Article.objects.filter(
+            category=Article.Category.BLOG,
+        ).filter(Q(status=Article.Status.PUBLISHED) | Q(is_published=True)).exclude(id=article.id).order_by("-published_at")[:3]
+    )
+    return render(request, "client/article_detail.html", {
+        "title": article.title,
+        "article": article,
+        "related_articles": related_articles,
+    })
+
+
+def gallery(request):
+    items = GalleryItem.objects.filter(is_published=True).order_by("-created_at")
+    return render(request, "client/gallery.html", {
+        "title": "Gallery",
+        "gallery_items": items,
+    })
 
 
 # ============================================================
@@ -638,11 +700,31 @@ def cv_preview(request):
 # ============================================================
 
 def _is_admin_handler(user):
-    return user.is_authenticated and user.role == "ADMIN_HANDLER"
+    return user.is_authenticated and user.role in {
+        User.Role.ADMIN,
+        User.Role.ADMIN_SUPER,
+        User.Role.ADMIN_HANDLER,
+    }
 
 
 def _is_partner(user):
-    return user.is_authenticated and user.role == "PARTNER"
+    return user.is_authenticated and user.role in {
+        User.Role.PARTNER,
+        User.Role.ATS_COORDINATOR,
+    }
+
+
+def _is_platform_staff(user):
+    return user.is_authenticated and user.role in {
+        User.Role.ADMIN,
+        User.Role.ADMIN_SUPER,
+        User.Role.ADMIN_HANDLER,
+        User.Role.PARTNER,
+        User.Role.CONTENT_MANAGER,
+        User.Role.DIGITAL_MARKETING,
+        User.Role.FINANCE_OFFICER,
+        User.Role.ATS_COORDINATOR,
+    }
 
 
 @login_required

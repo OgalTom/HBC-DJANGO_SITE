@@ -7,7 +7,7 @@
 <style>
     /* ---------- Page header ---------- */
     .page-hero {
-        background: linear-gradient(135deg, #0f4c81 0%, #102a43 100%);
+        background: #0f4c81;
         color: #ffffff;
         border-radius: 18px;
         padding: 32px 34px;
@@ -102,6 +102,21 @@
         flex-direction: column;
         transition: transform 0.15s ease, box-shadow 0.2s ease,
             border-color 0.2s ease;
+    }
+
+    .job-cover-wrap {
+        margin: -22px -22px 16px;
+        border-bottom: 1px solid #edf2f7;
+        overflow: hidden;
+        border-radius: 14px 14px 0 0;
+        background: #edf5ff;
+    }
+
+    .job-cover-image {
+        display: block;
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
     }
 
     .job-card:hover {
@@ -319,13 +334,19 @@
 <div class="job-grid">
     {% for job in page_obj %}
     <article class="job-card">
+        {% if job.cover_image or job.image_url %}
+        <div class="job-cover-wrap">
+            <img src="{{ job.cover_image|default:job.image_url }}" alt="{{ job.image_alt|default:job.title }}"
+                class="job-cover-image">
+        </div>
+        {% endif %}
         <div class="job-card-top">
             <div class="job-card-title">{{ job.title }}</div>
-            <div class="job-country-flag">{{ job.country|slice:":2"|upper }}</div>
+            <div class="job-country-flag">{{ job.country_flag|default:job.country|slice:":2"|upper }}</div>
         </div>
 
         <div class="job-tags">
-            <span class="job-tag">{{ job.country }}</span>
+            <span class="job-tag">{{ job.country_flag|default:'🌍' }} {{ job.country }}</span>
             <span class="job-tag sector">{{ job.sector }}</span>
             {% if job.visibility == 'MEMBERS_ONLY' %}
             <span class="job-tag members">Members only</span>
@@ -339,14 +360,29 @@
         {% if job.salary_disclosed and job.salary_range and is_member %}
         <div class="job-salary">{{ job.salary_range }}</div>
         {% elif job.salary_disclosed and job.salary_range %}
-        <div class="job-salary masked">🔒 Salary revealed for members</div>
+        <div class="job-salary masked"><svg class="icon-svg sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true" focusable="false">
+                <rect x="5" y="11" width="14" height="9" rx="2" />
+                <path d="M8 11V8.5A4 4 0 0 1 12 4.5a4 4 0 0 1 4 4V11" />
+            </svg> Salary revealed for members</div>
         {% else %}
-        <div class="job-salary masked">🔒 Salary undisclosed</div>
+        <div class="job-salary masked"><svg class="icon-svg sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true" focusable="false">
+                <rect x="5" y="11" width="14" height="9" rx="2" />
+                <path d="M8 11V8.5A4 4 0 0 1 12 4.5a4 4 0 0 1 4 4V11" />
+            </svg> Salary undisclosed</div>
         {% endif %}
 
         <a href="{% url 'client:job_detail' job_id=job.id %}" class="btn btn-primary"
             style="width:100%;justify-content:center;">
-            View Details →
+            View Details <svg class="icon-svg sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true" focusable="false">
+                <path d="M5 12h14" />
+                <path d="m13 5 7 7-7 7" />
+            </svg>
         </a>
     </article>
     {% endfor %}
@@ -357,10 +393,20 @@
 <nav class="pagination">
     {% if page_obj.has_previous %}
     <a
-        href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}{% if selected_sector %}&sector={{ selected_sector }}{% endif %}">←
+        href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}{% if selected_sector %}&sector={{ selected_sector }}{% endif %}"><svg
+            class="icon-svg sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M19 12H5" />
+            <path d="m12 19-7-7 7-7" />
+        </svg>
         Prev</a>
     {% else %}
-    <span class="disabled">← Prev</span>
+    <span class="disabled"><svg class="icon-svg sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+            focusable="false">
+            <path d="M19 12H5" />
+            <path d="m12 19-7-7 7-7" />
+        </svg> Prev</span>
     {% endif %}
 
     {% for num in page_obj.paginator.page_range %}
@@ -375,16 +421,31 @@
         {% if page_obj.has_next %}
         <a
             href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_country %}&country={{ selected_country }}{% endif %}{% if selected_sector %}&sector={{ selected_sector }}{% endif %}">Next
-            →</a>
+            <svg class="icon-svg sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true" focusable="false">
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+            </svg></a>
         {% else %}
-        <span class="disabled">Next →</span>
+        <span class="disabled">Next <svg class="icon-svg sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true" focusable="false">
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+            </svg></span>
         {% endif %}
 </nav>
 {% endif %}
 
 {% else %}
 <div class="empty-state">
-    <div class="icon">🔍</div>
+    <div class="icon"><svg class="icon-svg xl" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+            focusable="false">
+            <circle cx="11" cy="11" r="6" />
+            <path d="M16 16l4 4" />
+        </svg></div>
     <h3>No jobs match your search</h3>
     <p>Try adjusting the filters or clearing the search.</p>
     <a href="{% url 'client:jobs' %}" class="btn btn-secondary" style="margin-top:14px;">
